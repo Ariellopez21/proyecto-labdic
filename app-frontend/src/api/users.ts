@@ -15,7 +15,7 @@ export async function createUser(user: UserCreate): Promise<User> {
   })
 }
 
-export async function updateUser(user: UserUpdate): Promise<User> {
+export async function updateUser(user: UserUpdate): Promise<UserUpdate> {
   return await apiFetch(`/labdic_inventory/users/${user.id}`, {
     method: 'PATCH',
     headers: {
@@ -35,6 +35,12 @@ export async function getUserUpdate(id: number): Promise<UserUpdate> {
 
 export async function getMyUser(): Promise<User> {
   return await apiFetch('/labdic_inventory/users/me')
+}
+
+export async function deleteUser(id: number): Promise<void> {
+  await apiFetch(`/labdic_inventory/users/${id}`, {
+    method: 'DELETE',
+  })
 }
 
 export async function login(username: string, password: string): Promise<Token> {

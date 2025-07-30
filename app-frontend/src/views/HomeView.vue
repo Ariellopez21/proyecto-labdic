@@ -12,6 +12,5 @@ import { label } from '@primeuix/themes/aura/metergroup';
     <p class="text-xs text-gray-400 mt-2">Correo electrónico: arilopez@umag.cl | ariellopez.2002@hotmail.com</p>
     <p class="text-xs text-gray-400 mt-2">Contacto: +56 9 4139 4363</p>
     <p class="text-xs text-gray-400 mt-2">Futuro ingeniero</p>
-    <!-- <TodoList /> -->
   </div>
 </template>

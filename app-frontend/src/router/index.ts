@@ -5,6 +5,7 @@ import HomeView from '../views/HomeView.vue'
 import Login from '@/views/UserLogin.vue'
 import UserList from '@/views/UserList.vue'
 import UserCreate from '@/views/UserCreate.vue'
+import UserUpdate from '@/views/UserUpdate.vue'
 
 /* AUTH */
 import { useAuthStore } from '@/stores/auth'
@@ -33,6 +34,11 @@ const router = createRouter({
       path: '/users/create',
       name: 'new-user',
       component: UserCreate,
+    },
+      {
+      path: '/users/update/:id',
+      name: 'update-user',
+      component: UserUpdate,
     }
   ],
 })

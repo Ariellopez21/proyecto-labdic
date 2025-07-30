@@ -31,11 +31,10 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     Textarea: typeof import('primevue/textarea')['default']
     Toast: typeof import('primevue/toast')['default']
-    TodoFilters: typeof import('./src/components/TodoFilters.vue')['default']
-    TodoForm: typeof import('./src/components/TodoForm.vue')['default']
-    TodoItem: typeof import('./src/components/TodoItem.vue')['default']
-    TodoList: typeof import('./src/components/TodoList.vue')['default']
     TodoStatsCards: typeof import('./src/components/TodoStatsCards.vue')['default']
+    UserDetailsDialog: typeof import('./src/components/dialogs/UserDetailsDialog.vue')['default']
     UserForm: typeof import('./src/components/forms/UserForm.vue')['default']
+    UserUpdateDialog: typeof import('./src/components/forms/UserUpdateDialog.vue')['default']
+    UserUpdateForm: typeof import('./src/components/forms/UserUpdateForm.vue')['default']
   }
 }

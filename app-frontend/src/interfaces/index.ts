@@ -31,11 +31,12 @@ export interface Token {
 }
 
 export interface UserUpdate extends UserBase {
-  rut?: string
-  name?: string
-  email?: string
-  phone?: string
-  address?: string
+  rut: string
+  name: string
+  email: string
+  phone: string
+  address: string
+  password: string
 }
 
 export interface UserPrivate extends UserBase {

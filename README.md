@@ -15,9 +15,10 @@ Una aplicación con backend y frontend dedicado a la administración del Laborat
 
 ```bash
 cd app-backend
+source .venv/bin/activate
 uv sync
 uv run alembic upgrade head
-uv litestar run --reload # Starts on http://localhost:8000
+litestar run --reload # Starts on http://localhost:8000
 ```
 
 ### Frontend Run

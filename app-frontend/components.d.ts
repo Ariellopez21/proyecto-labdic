@@ -25,6 +25,7 @@ declare module 'vue' {
     Label: typeof import('primevue/label')['default']
     Message: typeof import('primevue/message')['default']
     MultiSelect: typeof import('primevue/multiselect')['default']
+    Password: typeof import('primevue/password')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
@@ -35,5 +36,6 @@ declare module 'vue' {
     TodoItem: typeof import('./src/components/TodoItem.vue')['default']
     TodoList: typeof import('./src/components/TodoList.vue')['default']
     TodoStatsCards: typeof import('./src/components/TodoStatsCards.vue')['default']
+    UserForm: typeof import('./src/components/forms/UserForm.vue')['default']
   }
 }

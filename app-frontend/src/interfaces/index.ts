@@ -15,6 +15,11 @@ export interface User extends UserBase {
 }
 
 export interface UserCreate extends UserBase {
+  rut: string
+  name: string
+  email: string
+  phone: string
+  address: string
   password: string
 }
 

@@ -3,7 +3,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 /* ROUTER LINKS */
 import HomeView from '../views/HomeView.vue'
 import Login from '@/views/UserLogin.vue'
-import UserManagement from '@/views/UserManagement.vue'
+import UserList from '@/views/UserList.vue'
+import UserCreate from '@/views/UserCreate.vue'
 
 /* AUTH */
 import { useAuthStore } from '@/stores/auth'
@@ -26,7 +27,12 @@ const router = createRouter({
     {
       path: '/users',
       name: 'list-users',
-      component: UserManagement,
+      component: UserList,
+    },
+    {
+      path: '/users/create',
+      name: 'new-user',
+      component: UserCreate,
     }
   ],
 })

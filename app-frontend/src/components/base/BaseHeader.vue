@@ -24,7 +24,7 @@ const items = [
   {
     label: 'Agregar',
     icon: 'pi pi-plus',
-    //command: () => router.push({ name: 'add-item' })
+    command: () => router.push({ name: 'new-user' })
   },
   {
     label: 'Solicitudes',

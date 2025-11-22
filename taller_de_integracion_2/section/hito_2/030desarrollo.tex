@@ -1,0 +1,360 @@
+\section{Grandes grupos funcionales}\label{sec:grandes_grupos}
+
+Para poder llevar a cabo los objetivos, el modelo de base de datos se organiza en torno a tres grandes grupos funcionales que reflejan el funcionamiento del sistema:
+
+Los \textbf{usuarios} interactúan con el sistema para solicitar un \textbf{préstamo} de \textbf{productos}, y dichas solicitudes son gestionadas por los administradores hasta concretar el préstamo y registrar su devolución.
+
+En el cuadro ~\ref{tab:grandes_grupos_funcionales} se resumen estos grupos y las entidades principales asociadas a cada uno de ellos.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{p{0.16\linewidth}p{0.34\linewidth}p{0.38\linewidth}}
+    \hline
+    \textbf{Grupo} & \textbf{Propósito principal} & \textbf{Entidades representativas} \\
+    \hline
+    Usuarios (\texttt{users}) & Gestionar la identidad, el rol y los permisos de quienes interactúan con el sistema. 
+                     & \texttt{users}, \texttt{roles} \\
+    \hline
+    Productos (\texttt{products}) & Representar el inventario de ítems prestables y su estado dentro del laboratorio. 
+                         & \texttt{products}, \texttt{devices}, \texttt{statuses}, \texttt{device\_status\_log}, \texttt{ubications}, \texttt{brands}, , \texttt{categories}, \texttt{models} \\
+    \hline
+    Préstamos (\texttt{loans}) & Modelar el ciclo de vida de los préstamos y su historial asociado. 
+                      & \texttt{loan\_request}, \texttt{loan\_request\_item}, \texttt{statuses}, \texttt{device\_status\_log} \\
+    \hline
+  \end{tabular}
+  \caption{Grandes grupos funcionales del modelo de datos de LabDIC.}
+  \label{tab:grandes_grupos_funcionales}
+\end{table}
+
+\section{División en tablas modulares}\label{sec:div_tablas_modulares}
+
+Los cambios futuros en la estructura de esta tabla, como la adición de nuevos campos o modificaciones en los existentes, se gestionarán fácilmente mediante el uso de migraciones controladas por Alembic, garantizando que el modelo de datos se mantenga escalable y flexible frente a futuros requerimientos.
+
+\subsection{Módulo de Usuarios}
+
+\subsubsection{Tabla usuarios}
+
+El módulo de usuarios está diseñado para gestionar la autenticación, control de acceso y roles dentro del sistema. La tabla \texttt{users} almacena la información básica de cada usuario, incluyendo sus datos personales, credenciales y el estado de su cuenta. Este modelo permite identificar de manera única a los usuarios mediante su RUT, nombre de usuario o correo electrónico, y controlar el acceso a las funcionalidades del sistema a través de campos como \texttt{is\_active} e \texttt{is\_admin}.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único del usuario. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{rut} & RUT del usuario, utilizado como identificador único. Este campo es obligatorio y único para cada usuario. \\
+    \hline
+    \texttt{name} & Nombre completo del usuario. Se utiliza para mostrar al usuario su nombre en el sistema. \\
+    \hline
+    \texttt{username} & Nombre de usuario único para acceder al sistema. Este campo también debe ser único. \\
+    \hline
+    \texttt{email} & Correo electrónico del usuario, utilizado para la autenticación y la comunicación. Este campo es único. \\
+    \hline
+    \texttt{password} & Contraseña cifrada del usuario. Es el campo crítico para la seguridad del acceso al sistema. \\
+    \hline
+    \texttt{phone} & Número de teléfono del usuario. Es un campo opcional. \\
+    \hline
+    \texttt{address} & Dirección física del usuario. También es un campo opcional. \\
+    \hline
+    \texttt{created\_at} & Fecha y hora en que el usuario fue creado en el sistema. Se asigna automáticamente al momento de la creación. \\
+    \hline
+    \texttt{is\_active} & Indica si la cuenta del usuario está activa. Permite habilitar o deshabilitar el acceso al sistema. \\
+    \hline
+    \texttt{is\_admin} & Define si el usuario tiene permisos de administrador. Es un campo booleano que indica si el usuario tiene privilegios adicionales dentro del sistema. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{users}.}
+  \label{tab:tabla_users}
+\end{table}
+
+\subsubsection{Tabla de roles}
+
+La tabla \texttt{roles} se encarga de almacenar los diferentes roles que los usuarios pueden tener dentro del sistema. Cada rol tiene un nombre único y una descripción opcional que explica sus permisos o funciones dentro del sistema. Esta tabla permite gestionar y asignar roles a los usuarios, facilitando el control de acceso y la administración de permisos.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único del rol. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{name} & Nombre del rol, utilizado para identificar el rol de manera única dentro del sistema (por ejemplo, 'admin', 'usuario'). Este campo es obligatorio y único. \\
+    \hline
+    \texttt{description} & Descripción del rol. Proporciona detalles sobre las funciones y permisos asociados con el rol. Es un campo opcional. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{roles}.}
+  \label{tab:tabla_roles}
+\end{table}
+
+La gestión de roles es fundamental para la administración de permisos en el sistema. A través de esta tabla, se pueden asignar diferentes capacidades a los usuarios según el rol que se les asigne, asegurando un control adecuado sobre el acceso y las funcionalidades disponibles para cada tipo de usuario.
+
+\subsection{Módulo de Productos}
+
+El módulo de productos es responsable de gestionar el inventario de ítems disponibles para préstamo dentro del sistema. La tabla \texttt{products} almacena la información de cada producto, como su nombre, descripción, cantidad disponible y otras propiedades relevantes para gestionar los préstamos de los productos. También se mantiene la relación con otras tablas como marcas, modelos y categorías de productos.
+
+\subsubsection{Tabla de productos}
+
+La tabla \texttt{products} es fundamental para el control del inventario, ya que permite gestionar y actualizar las existencias de los productos disponibles para préstamo. Además, almacena información relacionada con la descripción del producto y su relación con otras entidades, como las marcas y los modelos.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único del producto. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{name} & Nombre del producto (por ejemplo, 'Laptop Dell XPS 13'). Este campo es único y obligatorio. \\
+    \hline
+    \texttt{brand\_id} & ID de la marca asociada al producto. Es una clave foránea que referencia a la tabla \texttt{brands}. Este campo es opcional. \\
+    \hline
+    \texttt{model\_id} & ID del modelo asociado al producto. Es una clave foránea que referencia a la tabla \texttt{models}. Este campo es opcional. \\
+    \hline
+    \texttt{category\_id} & ID de la categoría del producto. Es una clave foránea que referencia a la tabla \texttt{categories}. Este campo es opcional. \\
+    \hline
+    \texttt{description} & Descripción detallada del producto. Este campo es opcional y proporciona información adicional sobre el producto. \\
+    \hline
+    \texttt{available\_stock} & Cantidad de unidades disponibles del producto para préstamo. Este campo es obligatorio y se actualiza conforme se prestan los productos. \\
+    \hline
+    \texttt{is\_active} & Indica si el producto está activo y disponible para préstamo. Este campo es booleano y tiene un valor predeterminado de \texttt{True}. \\
+    \hline
+    \texttt{created\_at} & Fecha y hora de creación del producto en el sistema. Este campo se asigna automáticamente al momento de la creación del producto. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{products}.}
+  \label{tab:tabla_products}
+\end{table}
+
+La tabla \texttt{products} es clave para el manejo eficiente del inventario y la gestión de los préstamos. Permite mantener un registro detallado de todos los productos, su disponibilidad y las características asociadas, y está diseñada para ser fácilmente ampliable en caso de que sea necesario agregar más atributos o relaciones con otras tablas.
+
+\subsubsection{Tabla de marcas}
+
+La tabla \texttt{brands} almacena las marcas asociadas a los productos. Cada marca tiene un nombre único, lo que permite categorizar los productos según su fabricante. Esta tabla está relacionada con la tabla \texttt{products}, de modo que cada producto puede tener una marca específica.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único de la marca. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{name} & Nombre de la marca, utilizado para identificarla de manera única dentro del sistema (por ejemplo, 'Dell', 'HP', 'Apple'). Este campo es obligatorio y único. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{brands}.}
+  \label{tab:tabla_brands}
+\end{table}
+
+\subsubsection{Tabla de modelos}
+
+La tabla \texttt{models} almacena los modelos de los productos. Cada modelo tiene un nombre único y está relacionado con los productos disponibles en el inventario. Al igual que la tabla de marcas, los productos pueden estar asociados a un modelo específico.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único del modelo. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{name} & Nombre del modelo (por ejemplo, 'XPS 13', 'Spectre x360', 'MacBook Pro'). Este campo es obligatorio y único. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{models}.}
+  \label{tab:tabla_models}
+\end{table}
+
+\subsubsection{Tabla de categorías}
+
+La tabla \texttt{categories} agrupa los productos en categorías específicas, como 'Laptops', 'Tablets' o 'Smartphones'. Esto facilita la organización y búsqueda de productos dentro del inventario.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único de la categoría. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{name} & Nombre de la categoría (por ejemplo, 'Laptops', 'Tablets', 'Smartphones'). Este campo es obligatorio y único. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{categories}.}
+  \label{tab:tabla_categories}
+\end{table}
+
+\subsubsection{Tabla de dispositivos}
+
+La tabla \texttt{devices} almacena la información detallada de cada elemento de un producto existente en el inventario.
+
+El motivo del nombre \textbf{dispositivo} surge a partir de que en el entorno de la tecnología, dentro del inventario del laboratorio, una gran cantidad y variedad de elementos dentro del mismo corresponde a \textit{dispositivos}. Es por ello que, cada dispositivo está asociado con un producto específico y tiene un código interno, número de serie y un estado asociado. Además, idealmente, se puede rastrear su ubicación dentro del sistema.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único del dispositivo. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{product\_id} & ID del producto asociado al dispositivo. Es una clave foránea que referencia a la tabla \texttt{products}. Este campo es obligatorio. \\
+    \hline
+    \texttt{internal\_code} & Código interno único para identificar el dispositivo. Este campo es opcional. \\
+    \hline
+    \texttt{serial\_number} & Número de serie único del dispositivo. Este campo es opcional y único. \\
+    \hline
+    \texttt{status\_id} & ID del estado del dispositivo. Es una clave foránea que referencia a la tabla \texttt{statuses}. Este campo es obligatorio. \\
+    \hline
+    \texttt{created\_at} & Fecha y hora de creación del dispositivo en el sistema. Este campo se asigna automáticamente al momento de la creación. \\
+    \hline
+    \texttt{ubication\_id} & ID de la ubicación del dispositivo. Es una clave foránea que referencia a la tabla \texttt{ubications}. Este campo es opcional. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{devices}.}
+  \label{tab:tabla_devices}
+\end{table}
+
+\subsubsection{Tabla de estados}\label{sec:statuses}
+
+La tabla \texttt{statuses} permite gestionar los diferentes estados de los dispositivos y las solicitudes asociadas, como 'available', 'borrowed', 'under maintenance', entre otros. Los estados se utilizan para rastrear el ciclo de vida de cada dispositivo y solicitud dentro del sistema.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único del estado. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{name} & Nombre del estado (por ejemplo, 'available', 'borrowed', 'under maintenance'). Este campo es obligatorio y único. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{statuses}.}
+  \label{tab:tabla_statuses}
+\end{table}
+
+\subsubsection{Tabla de ubicaciones}
+
+La tabla \texttt{ubications} gestiona las ubicaciones físicas de los dispositivos dentro del sistema. Cada ubicación tiene un nombre y una descripción opcional, lo que permite identificar fácilmente el lugar donde se encuentra cada dispositivo.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único de la ubicación. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{name} & Nombre de la ubicación (por ejemplo, 'TI-1', 'Sala de servidores', 'Administración'). Este campo es obligatorio y único. \\
+    \hline
+    \texttt{description} & Descripción detallada de la ubicación. Este campo es opcional y proporciona información adicional sobre la ubicación. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{ubications}.}
+  \label{tab:tabla_ubications}
+\end{table}
+
+\subsubsection{Tabla de registros de cambios de estado de dispositivos}\label{sec:device_status_logs}
+
+La tabla \texttt{device\_status\_logs} se utiliza para registrar cada cambio de estado de los dispositivos en el sistema. Cada vez que se cambia el estado de un dispositivo, se crea una entrada en esta tabla que incluye el estado anterior, el nuevo estado, la fecha y hora del cambio, el usuario que realizó la modificación y un comentario opcional sobre el cambio.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único del registro de cambio de estado. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{device\_id} & ID del dispositivo cuyo estado fue cambiado. Es una clave foránea que referencia a la tabla \texttt{devices}. Este campo es obligatorio. \\
+    \hline
+    \texttt{status\_id} & ID del nuevo estado del dispositivo. Es una clave foránea que referencia a la tabla \texttt{statuses}. Este campo es obligatorio. \\
+    \hline
+    \texttt{timestamp} & Fecha y hora en que se registró el cambio de estado. Este campo se asigna automáticamente al momento de la creación del registro. \\
+    \hline
+    \texttt{user\_id} & ID del usuario que realizó el cambio de estado. Es una clave foránea que referencia a la tabla \texttt{users}. Este campo es obligatorio. \\
+    \hline
+    \texttt{comment} & Comentario opcional sobre el cambio de estado, para dar contexto sobre el motivo del cambio. Este campo es opcional. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{device\_status\_logs}.}
+  \label{tab:tabla_device_status_logs}
+\end{table}
+
+\subsection{Módulo de Prestamos}\label{sec:modulo_prestamos}
+
+En este módulo, se gestionan las solicitudes de préstamo de dispositivos. Las tablas \texttt{device\_status\_logs} y \texttt{statuses}, que ya han sido descritas en las secciones \ref{sec:device_status_logs} y \ref{sec:statuses}, también son utilizadas en este módulo para registrar y gestionar el estado de las solicitudes y los dispositivos a lo largo de su ciclo de vida.
+
+\subsubsection{Tabla de solicitudes de préstamo}
+
+La tabla \texttt{loan\_requests} gestiona las solicitudes de préstamo de los usuarios. Cada solicitud incluye información como el usuario que la realizó, el estado de la solicitud, las fechas relacionadas con la entrega y devolución del dispositivo, así como una razón opcional para el préstamo.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único de la solicitud de préstamo. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{user\_id} & ID del usuario que realiza la solicitud. Es una clave foránea que referencia a la tabla \texttt{users}. Este campo es obligatorio. \\
+    \hline
+    \texttt{request\_date} & Fecha y hora en que se realizó la solicitud. Este campo se asigna automáticamente al momento de la creación de la solicitud. \\
+    \hline
+    \texttt{status\_id} & ID del estado de la solicitud. Es una clave foránea que referencia a la tabla \texttt{statuses}. Este campo es obligatorio. \\
+    \hline
+    \texttt{reason} & Motivo opcional de la solicitud de préstamo (por ejemplo, "Necesito el dispositivo para un proyecto"). \\
+    \hline
+    \texttt{delivery\_date} & Fecha en que se entrega el dispositivo al usuario. Este campo es opcional. \\
+    \hline
+    \texttt{estimated\_return\_date} & Fecha estimada de devolución del dispositivo. Este campo es opcional. \\
+    \hline
+    \texttt{actual\_return\_date} & Fecha real de devolución del dispositivo. Este campo es opcional y se completa cuando se retorna el dispositivo. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{loan\_requests}.}
+  \label{tab:tabla_loan_requests}
+\end{table}
+
+\subsubsection{Tabla de elementos de solicitudes de préstamo}
+
+La tabla \texttt{loan\_request\_items} gestiona los dispositivos individuales solicitados en una solicitud de préstamo. Cada elemento en esta tabla está asociado con una solicitud específica de préstamo y un dispositivo específico. Esto permite llevar un control detallado de los productos solicitados.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+    \hline
+    \textbf{Campo} & \textbf{Descripción} \\
+    \hline
+    \texttt{id} & Identificador único del elemento de la solicitud de préstamo. Es la clave primaria de la tabla. \\
+    \hline
+    \texttt{loan\_request\_id} & ID de la solicitud de préstamo asociada. Es una clave foránea que referencia a la tabla \texttt{loan\_requests}. Este campo es obligatorio. \\
+    \hline
+    \texttt{device\_id} & ID del dispositivo solicitado. Es una clave foránea que referencia a la tabla \texttt{devices}. Este campo es obligatorio. \\
+    \hline
+  \end{tabular}
+  \caption{Estructura de la tabla \texttt{loan\_request\_items}.}
+  \label{tab:tabla_loan_request_items}
+\end{table}
+
+\section{Modelo de base de datos}\label{sec:modelo_DB}
+
+En la sección \ref{sec:div_tablas_modulares}, se describieron de manera detallada las tablas del sistema, incluyendo sus campos y relaciones, con el objetivo de gestionar de forma eficiente el inventario y el ciclo de vida de los dispositivos. A partir de estas descripciones, el modelo de base de datos se implementa utilizando SQLAlchemy, que actúa como el ORM (Object-Relational Mapping) para facilitar la interacción entre el código Python y la base de datos relacional.
+
+Además, para asegurar la escalabilidad y facilitar futuras modificaciones del esquema, la gestión de las migraciones de la base de datos se realiza con Alembic, una herramienta que permite aplicar cambios incrementales de manera controlada. Esta solución asegura que cualquier modificación en el modelo de datos, ya sea la adición de nuevas tablas o campos, se maneje de manera eficiente y sin afectar los datos existentes.
+
+Todo el proyecto backend está configurado y gestionado dentro de un entorno virtual \texttt{.venv}, creado utilizando \texttt{uv from astral}. Esto garantiza la separación y aislamiento de dependencias, proporcionando un entorno controlado para el desarrollo y la ejecución del proyecto. La utilización de este entorno virtual facilita la instalación de las bibliotecas necesarias, como SQLAlchemy y Alembic, sin interferir con el sistema global.
+
+\subsection{Diagrama Entidad Relación}\label{sec:diagrama_ER}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{img/labdic_inventory_ER.png}
+    \caption{Diagrama ER del modelo para Inventario LabDIC}
+    \label{fig:diagrama_modelo_entidad_relacion}
+\end{figure}

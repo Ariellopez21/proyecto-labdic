@@ -1,0 +1,5 @@
+\section{Introducción}
+
+El presente documento aborda el diseño e implementación del modelo de base de datos para el sistema de inventario del Laboratorio del Departamento de Ingeniería en Computación de la Universidad de Magallanes. Con el fin de garantizar una estructura clara, escalable y eficiente, el modelo se organiza en tres grandes grupos funcionales: usuarios, productos y préstamos. Cada uno de estos grupos se encuentra subdividido en tablas modulares que permiten cubrir las necesidades actuales del laboratorio y facilitan su extensión futura.
+
+La modularidad constituye un eje central del diseño, permitiendo que el sistema evolucione sin comprometer su integridad ni su funcionamiento. Para lograrlo, la implementación se realiza en Python, utilizando SQLAlchemy como ORM para mapear las entidades y sus relaciones, junto con Alembic como herramienta de control de versiones del esquema. De este modo, cualquier modificación futura en la estructura de datos podrá ser gestionada mediante migraciones documentadas y reproducibles. Finalmente, el capítulo concluye con la presentación del diagrama Entidad–Relación que sintetiza visualmente el modelo planteado.

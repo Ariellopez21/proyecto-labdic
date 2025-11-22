@@ -1,0 +1,19 @@
+\section{Objetivos}
+
+\subsection{Objetivo general}
+
+Diseñar y mantener un modelo de base de datos relacional que soporte de forma consistente, segura y escalable la gestión de usuarios, productos y préstamos del sistema LabDIC, permitiendo la operación concurrente de múltiples administradores y clientes, así como el registro del ciclo de vida de los préstamos.
+
+\subsection{Objetivos específicos}
+
+\begin{itemize}
+  \item Registrar la información de los usuarios del sistema, sus credenciales lógicas, roles y permisos, de manera que se puedan distinguir claramente administradores y clientes, y controlar su nivel de acceso.
+  
+  \item Representar el inventario de productos disponibles para préstamo, incluyendo sus características relevantes y su estado dentro del laboratorio.
+  
+  \item Modelar el ciclo completo de los préstamos, desde la solicitud inicial, pasando por la aprobación o rechazo, hasta la entrega del producto y su posterior devolución, manteniendo un historial trazable de todas las operaciones.
+  
+  \item Garantizar la integridad referencial entre las entidades mediante el uso adecuado de claves primarias y claves foráneas.
+  
+  \item Facilitar la evolución futura del sistema mediante un esquema modular y normalizado, apoyado por el control de versiones del esquema a través de Alembic, de modo que los cambios posteriores en los requisitos sean viables a nivel de base de datos.
+\end{itemize}

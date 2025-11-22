@@ -1,0 +1,96 @@
+\section{Desarrollo}
+
+\subsection{Motivo de desarrollo del sistema}
+
+El laboratorio del Departamento de Ingeniería en Computación cuenta con personal encargado de diversas tareas administrativas, entre las que destacan la organización de salas, la revisión de equipos, la atención de requerimientos técnicos y la gestión de objetos extraviados. Sin embargo, una de las labores más demandantes corresponde al préstamo de material, que incluye notebooks, periféricos, unidades USB, libros de estudio, adaptadores y cables de red.
+
+Actualmente, este proceso se realiza de forma manual mediante formularios impresos, en los cuales los solicitantes deben registrar datos personales y de contacto. Dichos documentos, firmados por el encargado del laboratorio, sirven como respaldo tanto para la apertura como para el cierre de los préstamos. Este método genera un alto volumen de papeleo, dificulta la trazabilidad y depende exclusivamente de la disponibilidad física de los formularios. 
+
+Por otra parte, el laboratorio dispone de un archivo Excel que contiene el inventario de los equipos y recursos, pero este permanece inactivo, sin integrarse al proceso de control ni a la gestión de préstamos. La falta de actualización y uso de este recurso evidencia una oportunidad de mejora significativa en la administración del inventario.
+
+El uso de bases de datos relacionales, una aplicación web desplegada en los servidores del laboratorio y una arquitectura modular y escalable garantiza la trazabilidad, seguridad y proyección futura del sistema. De esta manera, la digitalización de los procesos permitirá contar con una herramienta confiable y adaptable, que no solo resuelva las necesidades actuales del laboratorio, sino que también siente las bases para incorporar nuevas funcionalidades y responder a requerimientos futuros.
+
+\subsection{Tecnologías a utilizar}
+
+Para el desarrollo del sistema se definió un conjunto de tecnologías que permiten garantizar robustez, escalabilidad y facilidad de mantenimiento, abarcando tanto la gestión de datos como el desarrollo de la aplicación web. A continuación, se describen los principales componentes del stack tecnológico seleccionado, y su profundización estará presente en la sección \ref{sec:marco_teorico}, a través del marco teórico:
+
+\subsubsection*{Backend}
+
+\begin{itemize}
+    \item \textbf{Base de datos}: PostgreSQL.
+    
+    \item \textbf{Gestión de versiones de la base de datos}: Alembic.
+    
+    \item \textbf{Lenguaje de desarrollo}: Python 
+
+    \item \textbf{ORM}: SQLAlchemy
+
+    \item \textbf{Framework}: Litestar
+\end{itemize}
+
+\subsubsection*{Frontend}
+
+\begin{itemize}
+    \item \textbf{Framework}: Vue 3
+
+    \item \textbf{Lenguaje de desarrollo}: TypeScript
+
+    \item \textbf{Diseño y componentes UI}: PrimeVue + TailwindCSS
+
+    \item \textbf{Gestión de estado}: Pinia
+
+    \item \textbf{Herramienta de construcción y servidor de desarrollo}: Vite
+\end{itemize} 
+
+\subsubsection*{Gestión}
+
+\begin{itemize}
+    \item \textbf{Gestión de entorno backend}: UV. 
+
+    \item \textbf{Gestión de entorno frontend}: bun. 
+
+    \item \textbf{Gestión de versiones del proyecto}: Git + Repositorio en github
+
+    \item \textbf{orquestador}: Docker Compose. 
+\end{itemize}
+
+El sistema se estructura bajo un modelo de arquitectura cliente-servidor, donde el frontend actúa como cliente que interactúa con los usuarios, el backend expone servicios mediante una API RESTful, y la base de datos se encarga de la persistencia de información. Este enfoque modular asegura que cada capa pueda evolucionar de manera independiente y facilita la integración futura de nuevas funcionalidades.
+
+\subsection{Requerimientos}
+
+El sistema responde a la necesidad de digitalizar, agilizar y reducir los errores humanos en la gestión de préstamos e inventario del laboratorio de computación. Para ello, se definen los siguientes requerimientos:
+
+\subsubsection*{Requerimientos Funcionales (RF)}
+\begin{itemize}
+    \item \textbf{RF1. Registro de préstamos}: El sistema debe permitir registrar préstamos en tiempo real, incluyendo usuario solicitante, material prestado y fechas de entrega y devolución.
+    \item \textbf{RF2. Gestión de inventario}: El sistema debe mantener un inventario dinámico, que se actualice automáticamente con cada préstamo o devolución, reflejando siempre el stock real.
+    \item \textbf{RF3. Notificaciones}: El sistema debe enviar notificaciones y recordatorios automáticos a usuarios y administradores sobre vencimientos, devoluciones y extensiones de préstamos.
+    \item \textbf{RF4. Gestión de usuarios}: El sistema debe permitir la creación, autenticación y administración de usuarios con contraseñas cifradas.
+    \item \textbf{RF5. Control de acceso}: El sistema debe implementar permisos diferenciados según el rol del usuario (Estudiante, Profesor, Administrador, Invitado).
+
+\end{itemize}
+
+\subsubsection*{Requerimientos No Funcionales (RNF)}
+\begin{itemize}
+    \item \textbf{RNF1. Seguridad}: El sistema debe utilizar técnicas de cifrado seguro para contraseñas (hashing con \texttt{pwdlib}) y garantizar la integridad de la información.
+    \item \textbf{RNF2. Escalabilidad}: El sistema debe estar diseñado de manera modular para permitir la incorporación de nuevos módulos en el futuro sin afectar la estabilidad.
+    \item \textbf{RNF3. Mantenibilidad}: El sistema debe contar con documentación técnica actualizada que facilite futuras mejoras y correcciones.
+    \item \textbf{RNF4. Rendimiento}: El sistema debe garantizar tiempos de respuesta nativos menores a 1.5 segundos, permitiendo la gestión simultánea de múltiples solicitudes sin afectar la experiencia del usuario.
+    \item \textbf{RNF5. Disponibilidad}: El sistema debe orquestarse con \textbf{Docker Compose}, asegurando portabilidad y configuración simplificada en los servidores del departamento.
+    \item \textbf{RNF6. Interfaz de usuario}: El sistema debe contar con una interfaz gráfica intuitiva, que facilite la interacción tanto a usuarios como a administradores.
+    \item \textbf{RNF7. Usabilidad}: La interfaz debe ser accesible, consistente y simple de utilizar, reduciendo la curva de aprendizaje de los usuarios.
+\end{itemize}
+
+\subsection{Planificación}
+
+La planificación del sistema se estructurará en un formato basado en hitos, los cuales representan entregas parciales con avances significativos. Cada hito estará directamente vinculado a la carta Gantt, funcionando como un punto de control que permite dar seguimiento al progreso y asegurar el cumplimiento de los objetivos establecidos.
+
+\begin{itemize}
+    \item \textbf{Hito 1:} Análisis de requerimientos y planificación general.
+    \item \textbf{Hito 2:} Diseño y validación del modelo de base de datos.
+    \item \textbf{Hito 3:} Implementación del módulo de usuarios (registro, autenticación, roles).
+    \item \textbf{Hito 4:} Desarrollo del módulo de inventario con actualización dinámica.
+    \item \textbf{Hito 5:} Implementación del módulo de préstamos e integración con inventario.
+    \item \textbf{Hito 6:} Incorporación de notificaciones y herramientas de administración.
+    \item \textbf{Hito 7:} Marcha blanca, despliegue y entrega final del sistema.
+\end{itemize}

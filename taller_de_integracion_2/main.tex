@@ -1,0 +1,39 @@
+% ----------- PRELUDIO -------------
+\input{Packages}
+\onehalfspacing % interlineado 1.5
+
+\begin{document}
+    \input{portada}
+    %\input{Portada_Anexo_B}    % No es importante.
+    \pagestyle{mystyle} % Encabezado personalizado
+
+% ----------- INDICE -------------
+    \tableofcontents
+    \listoffigures
+    %\lstlistoflistings
+    %\listofalgorithms
+    \listoftables
+
+    \newpage
+    
+% ----------- SECCIONES -------------
+
+    % HITO 1: Planificación, motivación y marco teórico
+    %\input{section/hito_1/000hito_1}
+    % HITO 2: Diseño y validación del modelo de base de datos
+    %\input{section/hito_2/000hito_2}
+    % HITO 3: Implementación del módulo del usuario
+    \input{section/hito_3/000hito_3}
+
+% ----------- BIBLIOGRAFIA -------------
+    % descomentar para Hito 1.
+    %\printbibliography[
+    %title={Bibliografía},
+    %heading=bibintoc]
+    
+% ----------- ANEXOS -------------
+
+    %\input{anexo/200AnexoB}    No es importante.
+    %\input{anexo/210AnexoB_details}    No es importante.
+
+\end{document}

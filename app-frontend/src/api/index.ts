@@ -1,16 +1,7 @@
 // src/api/index.ts
-import * as changeKeys from 'change-case/keys'
 
-import { useAuthStore } from "../stores/auth"
-import { useUserStore } from '../stores/user'
-import { useRouter } from 'vue-router'
-
+import { useAuthStore } from '@/stores/auth'
 export const BASE_URL = 'http://localhost:8000'
-
-interface RequestInitWithJson extends RequestInit {
-  json?: object | null | undefined
-}
-
 
 /**
  * Generic API fetch function that automatically sets the Authorization header
@@ -23,43 +14,46 @@ interface RequestInitWithJson extends RequestInit {
  * @returns The parsed JSON response
  */
 export async function apiFetch<T>(
-  endpoint: string,
-  options: RequestInitWithJson = {},
+  url: string,
+  options: RequestInit = {}
 ): Promise<T> {
   const auth = useAuthStore()
-  const user = useUserStore()
-  const router = useRouter()
+  const token = auth.token
 
-  let headers = options.headers || {}
-
-  if (auth.isAuthenticated) {
-    headers = {
-      Authorization: `Bearer ${auth.token}`,
-      ...headers
-    }
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {}), // Excepción a la regla.
+    /* Debido a que O2auth mantiene el formato clasico,
+     * para el caso de api/auth.ts vamos a usar encodedURL
+     * pero para el resto de las API mantendremos application/json.
+     */
+  }
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
   }
 
-  if (options.json) {
-    options.body = JSON.stringify(changeKeys.snakeCase(options.json, 5))
-    options.json = undefined
-  }
-
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+  const response = await fetch(url, {
     ...options,
-    headers: headers,
+    headers,
   })
 
   if (!response.ok) {
+    // If unauthorised, clear the token so the user is prompted to re-login
     if (response.status === 401) {
       auth.clearToken()
-      user.clearUser()
-
-      router.push({ name: 'login', query: { expiredToken: "true" } })
     }
-
-    throw new Error(`HTTP error! status: ${response.status}`)
+    const errorBody = await response.text().catch(() => '')
+    throw new Error(
+      /* Arrojamos un error con el estado y cuerpo para intentar ser más específico. */
+      `API request failed with status ${response.status}: ${errorBody}`
+    )
   }
 
-  const jsonResponse = await response.json()
-  return changeKeys.camelCase(jsonResponse, 5) as T
+  // No content to parse
+  if (response.status === 204) {
+    return null as unknown as T
+  }
+
+  const data = (await response.json().catch(() => null)) as T
+  return data
 }

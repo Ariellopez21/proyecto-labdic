@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getUsers, getUser, deleteUser } from '@/api/users'
-import type { User } from '../interfaces'
+import type { User } from '@/interfaces/User'
 import { ref, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'

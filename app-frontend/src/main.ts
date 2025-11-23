@@ -1,20 +1,20 @@
+// src/main.ts
 import 'primeicons/primeicons.css'
 import './assets/main.css'
 
 import { createApp } from 'vue'
-import { createPinia } from 'pinia'
 
 import App from './App.vue'
-import router from './router'
+import router from './router/index.ts'
 import setupPrimeVue from './plugins/primevue'
-import ToastService from 'primevue/toastservice'
+import setupPinia from './plugins/pinia.ts'
 
 const app = createApp(App)
 
-app.use(createPinia())
 app.use(router)
 
+setupPinia(app)
+// Register PrimeVue and related plugins
 setupPrimeVue(app)
-app.use(ToastService)
 
 app.mount('#app')

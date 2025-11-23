@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
-import { useUserStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
 
 const router = useRouter()
-const user = useUserStore()
 
 const items = [
   {
@@ -14,12 +12,12 @@ const items = [
   },
   { label: 'Usuarios',
     icon: 'pi pi-users',
-    command: () => router.push({ name: 'list-users' })
+    command: () => router.push({ name: 'users-list' })
   },
   {
     label: 'Inventario',
     icon: 'pi pi-box',
-    //command: () => router.push({ name: 'inventory' })
+    // standing command
   },
   {
     label: 'Agregar',
@@ -29,12 +27,12 @@ const items = [
   {
     label: 'Solicitudes',
     icon: 'pi pi-file',
-    //command: () => router.push({ name: 'requests' })
+    // standing command
   },
   {
     label: 'Mi usuario',
     icon: 'pi pi-user',
-    //command: () => router.push({ name: 'user-profile' })
+    // standing command
   },
   {
     label: 'Cerrar sesión',

@@ -60,6 +60,21 @@ export async function apiFetch<T>(
     throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  const jsonResponse = await response.json()
-  return changeKeys.camelCase(jsonResponse, 5) as T
+  // 204 No Content by DELETE.
+  if (response.status === 204) {
+    return undefined as T
+  }
+
+  // También puede haber 200 con cuerpo vacío, así que leemos como texto
+  const text = await response.text()
+
+  if (!text) {
+    // cuerpo vacío, nada que parsear
+    return undefined as T
+  }
+
+  // Si hay texto, asumimos JSON
+  const rawJson = JSON.parse(text)
+  const jsonResponse = changeKeys.camelCase(rawJson, 5) as T
+  return jsonResponse
 }

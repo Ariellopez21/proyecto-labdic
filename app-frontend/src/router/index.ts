@@ -4,8 +4,8 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import Login from '@/views/UserLogin.vue'
 import UserList from '@/views/UserList.vue'
-//import UserCreate from '@/views/UserCreate.vue'
-//import UserUpdate from '@/views/UserUpdate.vue'
+import UserCreate from '@/views/UserCreate.vue'
+import UserUpdate from '@/views/UserUpdate.vue'
 
 import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
@@ -28,7 +28,7 @@ const routes: RouteRecordRaw[] = [
     component: UserList,
     meta: { requiresAuth: true, requiresAdmin: true },
   },
-  /*{
+  {
     path: '/users/create',
     name: 'new-user',
     component: UserCreate,
@@ -39,7 +39,20 @@ const routes: RouteRecordRaw[] = [
     name: 'update-user',
     component: UserUpdate,
     meta: { requiresAuth: true, requiresAdmin: true },
-  },*/
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    redirect: (to) => ({
+      name: 'home',
+      query: {
+        ...to.query,
+        nf: '1',          // flag de "not found"
+        from: to.fullPath // opcional: de dónde venía
+      },
+    }),
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({

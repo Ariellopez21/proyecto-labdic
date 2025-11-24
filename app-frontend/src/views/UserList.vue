@@ -1,141 +1,160 @@
 <script setup lang="ts">
-import { getUsers, getUser, deleteUser } from '@/api/users'
+import { getUsers, deleteUser, getUser } from '@/api/users'
 import type { User } from '@/interfaces/User'
-import { ref, type Ref } from 'vue'
+import { ref, type Ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import Dialog from 'primevue/dialog'
 import { useToast } from 'primevue/usetoast'
+import UserDetailsDialog from '@/components/dialogs/UserDetailsDialog.vue'
+import UserDeleteConfirmDialog from '@/components/dialogs/UserDeleteConfirmDialog.vue'
 
-const toast = useToast()
-const router = useRouter()
+/* =============== STORES =============== */
 const user = useUserStore()
 
-const showDialogDetails = ref(false)
-const selectedUserDetails = ref<User | null>(null)
+/* =============== ROUTER =============== */
+const router = useRouter()
 
-// Dialog de confirmación para eliminar
-const showDeleteDialog = ref(false)
-const userToDelete = ref<User | null>(null)
+/* =============== TOAST =============== */
+const toast = useToast()
 
-/* LOAD USERS */
+/* =============== LOAD USERS =============== */
+const loading = ref(false)
 const users: Ref<User[]> = ref([])
 async function loadUsers() {
-  users.value = await getUsers()
+  loading.value = true
+  try{
+    users.value = await getUsers()
+  } catch (err: any) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error al cargar',
+      detail: 'No se pudieron cargar los usuarios. Intenta nuevamente.',
+      life: 4000,
+    })
+  } finally {
+    loading.value = false
+  }
 }
-loadUsers()
 
-/* DIALOGS */
-async function viewDetails(id: number) {
-  selectedUserDetails.value = await getUser(id)
+/* =============== VIEW DETAILS =============== */
+const showDialogDetails = ref(false)
+const selectedUserDetails: Ref<User | null> = ref(null)
+
+async function viewDetails(user: User) {
+  selectedUserDetails.value = user
   showDialogDetails.value = true
 }
 
-  /* PUSH FUNCTIONS */
-async function createUser() {
-  await router.push({ name: 'new-user' })
-}
-async function editUser(id: number) {
-  await router.push({ name: 'update-user', params: { id } })
-}
+/* =============== DELETE USERS =============== */
+const showDeleteDialog = ref(false)
+const userToDelete: Ref<User | null> = ref(null) // Este usuario se selecciona en <template>.
 
-function confirmDeleteUser(id: number) {
-  const user = users.value.find(u => u.id === id)
-  userToDelete.value = user || null
+function confirmDeleteUser(user: User) {
+  userToDelete.value = user
   showDeleteDialog.value = true
 }
-
 
 async function deleteUserHere() {
   if (!userToDelete.value) return
 
+  try {
     await deleteUser(userToDelete.value.id)
-    showDeleteDialog.value = false
-    userToDelete.value = null
-    selectedUserDetails.value = null
-    await loadUsers()
+    // actualizas la lista en memoria
+    users.value = users.value.filter(
+      u => u.id !== userToDelete.value!.id
+    )
 
     toast.add({
       severity: 'success',
-      summary: 'Eliminado',
-      detail: 'Usuario eliminado correctamente',
-      life: 3000
+      summary: 'Usuario eliminado',
+      detail: `Se eliminó a ${userToDelete.value.username}`,
+      life: 3000,
     })
+  } catch (err: any) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error al eliminar',
+      detail: 'No se pudo eliminar el usuario.',
+      life: 4000,
+    })
+  } finally {
+    showDeleteDialog.value = false
+    userToDelete.value = null
+  }
+}
+
+/* =============== ON MOUNTED =============== */
+onMounted(() => {
+  loadUsers()
+})
+
+/* =============== PUSH FUNCTIONS =============== */
+async function createUser() {
+  await router.push({ name: 'new-user' })
+}
+function editUser(u: User) {
+  router.push({
+    name: 'update-user',    // nombre de la ruta que ya definimos en el router
+    params: { id: u.id },   // pasamos el id en la URL
+  })
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex justify-end" v-if="user.isAdmin">
+    <div class="flex justify-end" v-if="user.name == 'admin'">
       <Button severity="primary" outlined @click="createUser" class="mb-4 gap-3 ">
         <i class="pi pi-plus"></i>
         Nuevo Usuario
       </Button>
     </div>
     <div>{{ user.name === null ? 'Sin Nombre' : user.name + ' - ' + user.isAdmin }}</div>
-    <DataTable v-if="users.length > 0" :value="users">
-      <Column field="rut" header="RUT" />
+    <DataTable :value="users" :loading="loading" dataKey="id">
       <Column field="username" header="Usuario" />
       <Column field="name" header="Nombre" />
-      <Column field="email" header="Correo Electrónico" />
       <Column field="phone" header="Teléfono" />
-      <Column>
-        <template #body="slotProps">
-          <div class="flex gap-4 justify-end">
-          <button
-            @click="viewDetails(slotProps.data.id)"
 
-            title="Ver detalles"
-          >
-            <i class="pi pi-info-circle" style="color:blue; font-size:1.2rem;"></i>
-          </button>
-          <button
-            @click="editUser(slotProps.data.id)"
-            title="Editar Usuario"
-          >
-            <i class="pi pi-pencil" style="color:orange; font-size:1.2rem;"></i>
-          </button>
-          <button
-            @click="confirmDeleteUser(slotProps.data.id)"
-            title="Eliminar Usuario"
-          >
-            <i class="pi pi-trash" style="color:red; font-size:1.2rem;"></i>
-          </button>
-          </div>
-        </template>
-      </Column>
+        <!-- Columna de acciones / info -->
+        <Column header="Acciones" :exportable="false">
+          <template #body="slotProps">
+            <!-- Botón de info -->
+            <Button
+              icon="pi pi-info-circle"
+              rounded
+              text
+              severity="info"
+              @click="viewDetails(slotProps.data)"
+            />
+            <!-- Botón de editar -->
+            <Button
+              icon="pi pi-pencil"
+              rounded
+              text
+              severity="secondary"
+              @click="editUser(slotProps.data)"
+            />
+            <!-- Botón de eliminar -->
+            <Button v-if ="user.name == 'admin'"
+              icon="pi pi-trash"
+              rounded
+              text
+              severity="danger"
+              @click="confirmDeleteUser(slotProps.data)"
+            />
+
+          </template>
+        </Column>
     </DataTable>
-
-    <!-- Dialog Confirmar Eliminación -->
-    <Dialog v-model:visible="showDeleteDialog" header="Confirmar Eliminación" :modal="true" :closable="false" style="min-width:350px;">
-      <template v-if="userToDelete">
-        <div class="mb-4">¿Estás seguro que deseas eliminar al usuario <b>{{ userToDelete.username }}</b>?</div>
-        <div class="flex justify-end gap-2">
-          <Button label="Cancelar" @click="showDeleteDialog = false" severity="secondary" />
-          <Button label="Aceptar" @click="deleteUserHere" severity="danger" />
-        </div>
-      </template>
-    </Dialog>
-
-    <!-- User Details Dialog -->
-    <Dialog v-model:visible="showDialogDetails" header="Detalles del Usuario" :modal="true" :closable="true" style="min-width:350px;">
-      <template v-if="selectedUserDetails">
-        <div> <b>ID: </b>{{ selectedUserDetails.id }}</div>
-        <div><b>RUT:</b> {{ selectedUserDetails.rut }}</div>
-        <div><b>Nombre:</b> {{ selectedUserDetails.name }}</div>
-        <div><b>Usuario:</b> {{ selectedUserDetails.username }}</div>
-        <div><b>Email:</b> {{ selectedUserDetails.email }}</div>
-        <div><b>Teléfono:</b> {{ selectedUserDetails.phone }}</div>
-        <div><b>Dirección:</b> {{ selectedUserDetails.address }}</div>
-        <div><b>Fecha de Creación:</b> {{ selectedUserDetails.createdAt }}</div>
-        <div class="flex justify-end mt-4">
-          <Button label="Cerrar" @click="showDialogDetails = false" />
-        </div>
-      </template>
-      <template v-else>
-        <div>Loading...</div>
-      </template>
-    </Dialog>
-
   </div>
+
+  <UserDetailsDialog
+  v-model="showDialogDetails"
+  :user="selectedUserDetails"
+  />
+
+  <UserDeleteConfirmDialog
+  v-model="showDeleteDialog"
+  :user="userToDelete"
+  @confirm="deleteUserHere"
+  />
 </template>

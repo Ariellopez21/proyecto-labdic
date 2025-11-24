@@ -1,54 +1,65 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth';
-import { useRouter } from 'vue-router';
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
+const auth = useAuthStore()
+const user = useUserStore()
 
-const items = [
+// Ítems visibles para cualquiera que esté autenticado (o incluso público)
+const baseItems = [
   {
     label: 'Inicio',
     icon: 'pi pi-home',
     command: () => router.push({ name: 'home' }),
   },
-  { label: 'Usuarios',
-    icon: 'pi pi-users',
-    command: () => router.push({ name: 'users-list' })
-  },
-  {
-    label: 'Inventario',
-    icon: 'pi pi-box',
-    // standing command
-  },
-  {
-    label: 'Agregar',
-    icon: 'pi pi-plus',
-    command: () => router.push({ name: 'new-user' })
-  },
-  {
-    label: 'Solicitudes',
-    icon: 'pi pi-file',
-    // standing command
-  },
-  {
-    label: 'Mi usuario',
-    icon: 'pi pi-user',
-    // standing command
-  },
-  {
-    label: 'Cerrar sesión',
-    icon: 'pi pi-sign-out',
-    command: () => logout()
-  },
+  // aquí puedes agregar otros ítems generales:
+  // {
+  //   label: 'Inventario',
+  //   icon: 'pi pi-box',
+  //   command: () => router.push({ name: 'inventory' }),
+  // },
 ]
 
-async function logout() {
-  const auth = useAuthStore()
-
-  auth.clearToken()
-  await router.push({ name: 'login' })
+// Ítems que requieren permiso especial (admin / profesor)
+const usersItem = {
+  label: 'Usuarios',
+  icon: 'pi pi-users',
+  command: () => router.push({ name: 'users-list' }),
 }
 
+// Logout opcional desde el header
+async function handleLogout() {
+  auth.clearToken()
+  user.clearUser()
+  router.push({ name: 'login' })
+}
+
+// Menú final que usará la plantilla
+// Por ahora: solo admin puede ver "Usuarios".
+// Cuando tengas profesor, cambiaríamos la condición a algo como user.canListUsers.
+const menuItems = computed(() => {
+  const items = [...baseItems]
+
+  if (auth.isAuthenticated && user.isAdmin) {
+    items.push(usersItem)
+  }
+
+
+  if (auth.isAuthenticated){
+    items.push({
+      label: 'Cerrar Sesión',
+      icon: 'pi pi-sign-out',
+      command: handleLogout,
+    })
+  }
+
+  return items
+})
 </script>
+
 
 <template>
   <nav class="bg-white border-b border-gray-200 px-4 py-3">
@@ -65,7 +76,7 @@ async function logout() {
 
         <nav class="hidden md:flex space-x-1">
           <a
-            v-for="item in items"
+            v-for="item in menuItems"
             :key="item.label"
             href="#"
             class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"

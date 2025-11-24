@@ -14,6 +14,13 @@ onMounted(() => {
       detail: 'No tienes permisos para acceder a esta página.',
       life: 3000,
     })
+  }else if (route.query.nf === '1') {
+    toast.add({
+      severity: 'warn',
+      summary: 'Redirigido',
+      detail: 'La página que intentaste abrir no existe.',
+      life: 4000,
+    })
   }
 })
 </script>

@@ -3,7 +3,6 @@
 export interface UserBase {
   id: number  // Borrarlo dsp.
   username: string
-  isAdmin: boolean
 }
 
 export interface User extends UserBase {
@@ -13,6 +12,7 @@ export interface User extends UserBase {
   phone: string
   address: string
   createdAt: Date
+  isAdmin: boolean
   isActive: boolean
 }
 

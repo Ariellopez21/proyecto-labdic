@@ -22,6 +22,7 @@ export const useUserStore = defineStore('user', () => {
    * Whether the current user has admin privileges.
    */
   const isAdmin = computed(() => currentUser.value?.isAdmin === true)
+  const canListUsers = computed(() => isAdmin.value)
 
   /**
    * Persist the current user to localStorage and update the reactive reference.
@@ -62,5 +63,5 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  return { currentUser, name, isAdmin, setUser, clearUser }
+  return { currentUser, name, isAdmin, canListUsers, setUser, clearUser }
 })

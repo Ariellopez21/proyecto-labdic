@@ -9,11 +9,9 @@ export async function getUsers(): Promise<User[]> {
   return await apiFetch(USERS)
 }
 
-
 export async function getUser(id: number): Promise<User> {
   return await apiFetch(`${USERS}/${id}`)
 }
-
 
 export async function getMyUser(): Promise<User> {
   return await apiFetch(`${USERS}/me`)

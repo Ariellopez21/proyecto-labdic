@@ -16,11 +16,15 @@ export interface User extends UserBase {
   isActive: boolean
 }
 
-export interface UserCreate extends UserBase {
+export interface NewUserPayload {
+  username: string
   rut: string
   name: string
   email: string
   phone: string
   address: string
   password: string
+  isAdmin: boolean
 }
+
+export type UpdateUserPayload = Partial<NewUserPayload>

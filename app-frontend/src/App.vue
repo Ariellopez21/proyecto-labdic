@@ -3,18 +3,68 @@ import { RouterView, useRoute } from 'vue-router'
 import BaseHeader from '@/components/base/BaseHeader.vue'
 
 const route = useRoute()
-
 </script>
 
 <template>
   <Toast />
-  <div v-if="route.name === 'login'">
-    <RouterView />
-  </div>
-  <div v-else class="container mx-auto my-2">
-    <BaseHeader class="mb-3 !bg-gray-100" />
-    <RouterView />
+
+  <!-- Raíz que aplica el fondo; mantiene comportamiento especial para la ruta 'login' -->
+  <div :class="['app-root', route.name === 'login' ? 'login-mode' : 'app-mode']">
+
+    <!-- Modo login: mostrar solo la vista de login sin header ni footer -->
+    <div v-if="route.name === 'login'" class="page-wrapper">
+      <RouterView />
+    </div>
+
+    <!-- Modo aplicación: header, contenido central con transición y footer -->
+    <div v-else class="app-shell">
+      <BaseHeader class="app-header" />
+
+      <main class="content-container">
+        <Transition name="fade" mode="out-in">
+          <RouterView />
+        </Transition>
+      </main>
+
+      <footer class="app-footer">
+        <div class="container-text">© LabDIC — Ariel López · 2025</div>
+      </footer>
+    </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* Variables y fondo global */
+:root {
+  --bg-top: #0f172a;
+  --bg-bottom: #0b1220;
+}
+.app-root{ min-height:100vh; background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%); }
+
+.page-wrapper{ min-height:100vh; display:flex; align-items:center; justify-content:center; }
+
+.app-shell{ display:flex; flex-direction:column; min-height:100vh; }
+.app-header{ z-index:50 }
+
+.content-container{ flex:1; display:flex; align-items:flex-start; justify-content:center; padding:1.25rem; }
+.content-container > * { width:100%; max-width:1100px; }
+
+.app-footer{ text-align:center; padding:1rem 0; color:rgba(255,255,255,0.65); font-size:0.9rem; border-top:1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent); }
+
+.container-text{ max-width:1100px; margin:0 auto; }
+
+/* Transición simple entre rutas */
+.fade-enter-active, .fade-leave-active { transition: opacity 180ms ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .content-container{ padding: 1rem; }
+  .container-text{ padding:0 1rem }
+}
+
+/* Ajustes visuales cuando estamos en la pantalla de login */
+.login-mode { background: linear-gradient(180deg, #0f172a 0%, #081226 100%); }
+.login-mode .page-wrapper { padding: 2rem; }
+
+</style>

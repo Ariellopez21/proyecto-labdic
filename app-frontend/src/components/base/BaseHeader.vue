@@ -30,6 +30,12 @@ const usersItem = {
   command: () => router.push({ name: 'users-list' }),
 }
 
+const myUserItem = {
+  label: 'Mi usuario',
+  icon: 'pi pi-user',
+  command: () => router.push({ name: 'my-user' }),
+}
+
 // Logout opcional desde el header
 async function handleLogout() {
   auth.clearToken()
@@ -47,6 +53,9 @@ const menuItems = computed(() => {
     items.push(usersItem)
   }
 
+  if (auth.isAuthenticated) {
+    items.push(myUserItem)
+  }
 
   if (auth.isAuthenticated){
     items.push({

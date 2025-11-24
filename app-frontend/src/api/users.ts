@@ -1,5 +1,5 @@
 // src/api/users.ts
-import type { User, UserCreate } from '../interfaces/User'
+import type { User, NewUserPayload, UpdateUserPayload } from '@/interfaces/User'
 import { apiFetch } from '@/api/index'
 
 // Base path for user-related API endpoints
@@ -17,13 +17,20 @@ export async function getMyUser(): Promise<User> {
   return await apiFetch(`${USERS}/me`)
 }
 
-export async function createUser(user: UserCreate): Promise<User> {
+export async function createUser(payload: NewUserPayload): Promise<User> {
   return await apiFetch<User>(USERS, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    json: user,
+    json: payload,  // tu apiFetch viejo se encarga de JSON + snake/camel
+  })
+}
+
+export async function updateUser(
+  id: number,
+  payload: UpdateUserPayload,
+): Promise<User> {
+  return await apiFetch<User>(`${USERS}/${id}`, {
+    method: 'PATCH',       // o 'PATCH' si tu backend usa PATCH
+    json: payload,
   })
 }
 

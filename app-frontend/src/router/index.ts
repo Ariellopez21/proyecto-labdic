@@ -6,6 +6,7 @@ import Login from '@/views/UserLogin.vue'
 import UserList from '@/views/UserList.vue'
 import UserCreate from '@/views/UserCreate.vue'
 import UserUpdate from '@/views/UserUpdate.vue'
+import MyUserView from '@/views/MyUserView.vue'
 
 import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
@@ -39,6 +40,12 @@ const routes: RouteRecordRaw[] = [
     name: 'update-user',
     component: UserUpdate,
     meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/me',
+    name: 'my-user',
+    component: MyUserView,
+    meta: { requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',

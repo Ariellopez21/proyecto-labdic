@@ -153,7 +153,12 @@ onMounted(() => {
         <template #content>
           <div v-if="loading" class="py-8 text-center text-slate-300">Cargando datos del usuario...</div>
           <div v-else>
-            <UserForm :model-value="initial_form" :submitting="submitting" mode="edit" @submit="handleSubmit" @cancel="handleCancel" />
+            <UserForm
+            :model-value="initial_form"
+            :submitting="submitting"
+            mode="edit"
+            @submit="handleSubmit"
+            @cancel="handleCancel" />
           </div>
         </template>
       </Card>

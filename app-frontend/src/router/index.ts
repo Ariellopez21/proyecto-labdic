@@ -7,6 +7,7 @@ import UserList from '@/views/UserList.vue'
 import UserCreate from '@/views/UserCreate.vue'
 import UserUpdate from '@/views/UserUpdate.vue'
 import MyUserView from '@/views/MyUserView.vue'
+import AdminRolesView from '@/views/AdminRolesView.vue'
 
 import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
@@ -46,6 +47,12 @@ const routes: RouteRecordRaw[] = [
     name: 'my-user',
     component: MyUserView,
     meta: { requiresAuth: true },
+  },
+  {
+  path: '/admin/roles',
+  name: 'admin-roles',
+  component: AdminRolesView,
+  meta: { requiresAuth: true, requiresAdmin: true },
   },
   {
     path: '/:pathMatch(.*)*',

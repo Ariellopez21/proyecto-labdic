@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import UserForm from '@/components/forms/UserForm.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
-import { createUser } from '@/api/users'
-import UserForm from '@/components/forms/UserForm.vue'
 import type { NewUserPayload } from '@/interfaces/User'
+import { createUser } from '@/api/users'
 
 const router = useRouter()
 const toast = useToast()
@@ -19,7 +19,9 @@ const initial_form = ref<NewUserPayload>({
   address: '',
   password: '',
   isAdmin: false,
+  roleIds: [],
 })
+
 const submitting = ref(false)
 
 async function handleSubmit(payload: NewUserPayload) {
@@ -46,7 +48,6 @@ async function handleSubmit(payload: NewUserPayload) {
     submitting.value = false
   }
 }
-
 
 function handleCancel() {
   router.push({ name: 'users-list' })

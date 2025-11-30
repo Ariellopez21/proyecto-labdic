@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import type { NewUserPayload } from '@/interfaces/User'
+import type { Role } from '@/interfaces/Role'
+import { getRoles } from '@/api/roles'
 
 interface Props {
   modelValue?: NewUserPayload | null
@@ -28,6 +30,7 @@ const form = ref<NewUserPayload>({
   address: '',
   password: '',
   isAdmin: false,
+  roleIds: [],
 })
 
 // Si nos pasan un valor inicial (para editar), lo copiamos
@@ -56,6 +59,26 @@ function validateForm(): string | null {
   return null
 }
 
+const allRoles = ref<Role[]>([])
+const loadingRoles = ref(false)
+
+async function loadRoles() {
+  loadingRoles.value = true
+  try {
+    allRoles.value = await getRoles()
+    //console.log(`Roles cargados en ${props.mode === 'edit' ? 'Update' : 'Create'}:`, allRoles.value)
+  } catch (err) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error al cargar roles',
+      detail: 'No se pudieron cargar los roles disponibles.',
+      life: 4000,
+    })
+  } finally {
+    loadingRoles.value = false
+  }
+}
+
 function onSubmit() {
   const error = validateForm()
   if (error) {
@@ -75,6 +98,10 @@ function onSubmit() {
 function onCancel() {
   emit('cancel')
 }
+
+onMounted(() => {
+  loadRoles()
+})
 </script>
 
 <template>
@@ -158,6 +185,26 @@ function onCancel() {
           toggleMask
           :disabled="disabled"
        />
+    </div>
+
+    <!-- Roles -->
+    <div class="mt-3">
+      <label class="block text-sm font-medium text-slate-200 mb-1">
+        Roles
+      </label>
+      <MultiSelect
+        v-model="form.roleIds"
+        :options="allRoles"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Roles del usuario"
+        display="chip"
+        class="w-full"
+        :loading="loadingRoles"
+      />
+      <p class="mt-1 text-xs text-slate-400">
+        Por defecto, si no seleccionas nada, el backend asignará el rol "Usuario".
+      </p>
     </div>
 
     <!-- Es admin -->

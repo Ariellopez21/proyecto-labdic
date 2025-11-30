@@ -21,9 +21,7 @@ const route = useRoute()
       <BaseHeader class="app-header" />
 
       <main class="content-container">
-        <Transition name="fade" mode="out-in">
           <RouterView />
-        </Transition>
       </main>
 
       <footer class="app-footer">

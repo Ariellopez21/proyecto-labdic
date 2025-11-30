@@ -76,5 +76,6 @@ export async function apiFetch<T>(
   // Si hay texto, asumimos JSON
   const rawJson = JSON.parse(text)
   const jsonResponse = changeKeys.camelCase(rawJson, 5) as T
+  console.log('apiFetch response:', jsonResponse)
   return jsonResponse
 }

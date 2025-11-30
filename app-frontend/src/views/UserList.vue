@@ -117,7 +117,7 @@ function editUser(u: User) {
         <template #content>
           <div class="mb-4 flex justify-between items-center">
             <div class="text-sm text-slate-300">{{ user.name === null ? 'Sin Nombre' : user.name + ' - ' + user.isAdmin }}</div>
-            <div v-if="user.name == 'admin'">
+            <div v-if="user.canManageUsers">
               <Button severity="primary" outlined @click="createUser" class="gap-3">
                 <i class="pi pi-plus"></i>
                 Nuevo Usuario
@@ -132,9 +132,20 @@ function editUser(u: User) {
 
             <Column header="Acciones" :exportable="false">
               <template #body="slotProps">
-                <Button icon="pi pi-info-circle" rounded text severity="info" @click="viewDetails(slotProps.data)" />
-                <Button v-if ="user.name == 'admin'" icon="pi pi-pencil" rounded text severity="secondary" @click="editUser(slotProps.data)" />
-                <Button v-if ="user.name == 'admin'" icon="pi pi-trash" rounded text severity="danger" @click="confirmDeleteUser(slotProps.data)" />
+                <Button
+                icon="pi pi-info-circle"
+                rounded text severity="info"
+                @click="viewDetails(slotProps.data)" />
+
+                <Button v-if ="user.canManageUsers"
+                icon="pi pi-pencil"
+                rounded text severity="secondary"
+                @click="editUser(slotProps.data)" />
+
+                <Button v-if ="user.canManageUsers"
+                icon="pi pi-trash"
+                rounded text severity="danger"
+                @click="confirmDeleteUser(slotProps.data)" />
               </template>
             </Column>
           </DataTable>

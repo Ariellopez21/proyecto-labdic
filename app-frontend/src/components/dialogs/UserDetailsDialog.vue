@@ -56,9 +56,24 @@ function close() {
         <span class="ml-2">{{ user.address }}</span>
       </div>
       <div>
-        <span class="font-bold">Rol:</span>
+        <span class="font-bold">Roles:</span>
         <span class="ml-2">
-          {{ user.isAdmin ? 'Administrador' : 'Usuario' }}
+          <span
+            v-if="user.roles && user.roles.length"
+            class="inline-flex flex-wrap gap-2 align-middle"
+          >
+            <span
+              v-for="role in user.roles"
+              :key="role.id"
+              class="inline-flex items-center px-2.5 py-1 rounded-full
+                    bg-sky-700/60 text-sky-100 text-xs font-medium border border-sky-400/70"
+            >
+              {{ role.name }}
+            </span>
+          </span>
+          <span v-else class="italic text-slate-400">
+            Sin roles asignados
+          </span>
         </span>
       </div>
       <div>

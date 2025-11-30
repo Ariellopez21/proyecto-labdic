@@ -79,8 +79,25 @@ onMounted(() => {
             </div>
 
             <div class="grid grid-cols-3 gap-2">
-              <span class="text-sm font-semibold text-slate-400">Rol</span>
-              <span class="col-span-2 text-sm">{{ myUser.isAdmin ? 'Administrador' : 'Usuario' }}</span>
+              <span class="text-sm font-semibold text-slate-400">Roles:</span>
+              <span class="col-span-2 text-sm">
+                <span
+                  v-if="myUser.roles && myUser.roles.length"
+                  class="inline-flex flex-wrap gap-2 align-middle"
+                >
+                  <span
+                    v-for="role in myUser.roles"
+                    :key="role.id"
+                    class="inline-flex items-center px-2.5 py-1 rounded-full
+                          bg-sky-700/60 text-sky-100 text-xs font-medium border border-sky-400/70"
+                  >
+                    {{ role.name }}
+                  </span>
+                </span>
+                <span v-else class="italic text-slate-400">
+                  Sin roles asignados
+                </span>
+              </span>
             </div>
 
             <div class="grid grid-cols-3 gap-2">

@@ -116,7 +116,6 @@ function editUser(u: User) {
 
         <template #content>
           <div class="mb-4 flex justify-between items-center">
-            <div class="text-sm text-slate-300">{{ user.name === null ? 'Sin Nombre' : user.name + ' - ' + user.isAdmin }}</div>
             <div v-if="user.canManageUsers">
               <Button severity="primary" outlined @click="createUser" class="gap-3">
                 <i class="pi pi-plus"></i>

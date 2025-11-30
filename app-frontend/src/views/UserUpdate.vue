@@ -19,6 +19,7 @@ const submitting = ref(false)
 const loading = ref(true)
 const userId = Number(route.params.id)
 
+
 const initial_form = ref<NewUserPayload>({
   username: '',
   rut: '',
@@ -28,11 +29,14 @@ const initial_form = ref<NewUserPayload>({
   address: '',
   password: '',
   isAdmin: false,
+  roleIds: [],
 })
 
 async function loadUser() {
+  loading.value = true
   try {
     const u: User = await getUser(userId)
+    //console.log('User loaded for edit:', u)
     initial_form.value = {
       username: u.username,
       rut: u.rut,
@@ -42,6 +46,7 @@ async function loadUser() {
       address: u.address,
       isAdmin: u.isAdmin,
       password: '',   // no la traemos del backend
+      roleIds: u.roles.map((r) => r.id),
     }
   } catch (err) {
     console.error(err)

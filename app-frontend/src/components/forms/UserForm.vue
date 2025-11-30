@@ -56,6 +56,7 @@ function validateForm(): string | null {
     return 'La contraseña es obligatoria.'
   }  if (!form.value.name.trim()) return 'El nombre es obligatorio.'
   if (!form.value.email.trim()) return 'El correo es obligatorio.'
+  if (!form.value.roleIds || form.value.roleIds.length === 0) return 'Debe asignar al menos un rol.'
   return null
 }
 

@@ -131,10 +131,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-900 flex items-center justify-center px-4">
-    <div class="w-full max-w-5xl grid md:grid-cols-2 gap-6">
+  <div class="min-h-screen page-root flex items-center justify-center px-4">
+    <div class="w-full max-w-7xl grid md:grid-cols-2 gap-8">
       <!-- Lista de roles -->
-      <Card class="bg-slate-800 text-white shadow-xl rounded-2xl">
+      <Card class="card-panel shadow-xl rounded-2xl">
         <template #header>
           <div class="px-6 pt-6">
             <h2 class="text-xl font-semibold">Roles existentes</h2>
@@ -177,7 +177,7 @@ onMounted(() => {
       </Card>
 
       <!-- Formulario crear/editar -->
-      <Card class="bg-slate-800 text-white shadow-xl rounded-2xl">
+      <Card class="card-panel shadow-xl rounded-2xl">
         <template #header>
           <div class="px-6 pt-6 flex items-center justify-between">
             <div>
@@ -240,3 +240,28 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Use the app-level background variables so the page is "sin color" (white or black via prefers-color-scheme) */
+.page-root{ min-height:100vh; display:flex; align-items:center; justify-content:center; background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%); padding:2rem }
+
+/* Card appearance: transparent background, subtle border that adapts to color scheme */
+.card-panel{ background: transparent; color: inherit; padding: 0; }
+.card-panel .p-card { background: transparent; box-shadow: none; }
+.card-panel { border-radius: 1rem; }
+.card-panel { border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 8px 30px rgba(2,6,23,0.06); }
+
+@media (prefers-color-scheme: dark) {
+  .card-panel { border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 8px 30px rgba(2,6,23,0.6); }
+}
+
+/* Make inner content breathe more on wide screens */
+.w-full.max-w-7xl { max-width: 80rem }
+
+/* Maintain good spacing on mobile */
+@media (max-width: 768px) {
+  .page-root { padding: 1rem }
+  .grid { gap: 1rem }
+}
+
+</style>

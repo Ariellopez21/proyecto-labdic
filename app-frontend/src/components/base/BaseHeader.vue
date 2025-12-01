@@ -74,10 +74,8 @@ const menuItems = computed(() => {
   <nav class="bg-white border-b border-gray-200 px-4 py-3">
     <div class="container mx-auto max-w-7xl flex items-center justify-between">
       <div class="flex items-center space-x-6">
-        <div class="flex items-center space-x-2">
-          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <i class="pi pi-check text-white font-bold" />
-          </div>
+          <div class="flex items-center space-x-2">
+          <div class="logo">LD</div>
           <h1 class="text-xl font-bold text-gray-900">
             LabDIC Inventory - Alpha Version
           </h1>
@@ -99,3 +97,7 @@ const menuItems = computed(() => {
     </div>
   </nav>
 </template>
+
+<style scoped>
+.logo{ width:32px; height:32px; border-radius:8px; background: linear-gradient(135deg,#4f46e5,#06b6d4); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; }
+</style>

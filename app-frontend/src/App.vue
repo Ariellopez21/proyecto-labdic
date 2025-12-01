@@ -32,11 +32,19 @@ const route = useRoute()
 </template>
 
 <style scoped>
-/* Variables y fondo global */
+/* Fondo sin color: blanco en modo claro, negro en modo oscuro. */
 :root {
-  --bg-top: #0f172a;
-  --bg-bottom: #0b1220;
+  --bg-top: #ffffff;
+  --bg-bottom: #ffffff;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-top: #000000;
+    --bg-bottom: #000000;
+  }
+}
+
 .app-root{ min-height:100vh; background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%); }
 
 .page-wrapper{ min-height:100vh; display:flex; align-items:center; justify-content:center; }
@@ -47,7 +55,7 @@ const route = useRoute()
 .content-container{ flex:1; display:flex; align-items:flex-start; justify-content:center; padding:1.25rem; }
 .content-container > * { width:100%; max-width:1100px; }
 
-.app-footer{ text-align:center; padding:1rem 0; color:rgba(255,255,255,0.65); font-size:0.9rem; border-top:1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent); }
+.app-footer{ text-align:center; padding:1rem 0; color:rgba(0,0,0,0.65); font-size:0.9rem; border-top:1px solid rgba(0,0,0,0.06); background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent); }
 
 .container-text{ max-width:1100px; margin:0 auto; }
 
@@ -61,8 +69,8 @@ const route = useRoute()
   .container-text{ padding:0 1rem }
 }
 
-/* Ajustes visuales cuando estamos en la pantalla de login */
-.login-mode { background: linear-gradient(180deg, #0f172a 0%, #081226 100%); }
+/* Modo login: reutiliza el mismo fondo "sin color" */
+.login-mode { background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%); }
 .login-mode .page-wrapper { padding: 2rem; }
 
 </style>

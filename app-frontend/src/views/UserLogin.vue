@@ -81,11 +81,10 @@ if (route.query.expiredToken) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
   padding: 2rem;
 }
 .login-container{ width:100%; max-width:420px; }
-.login-card{ padding:1.25rem; border-radius:12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 8px 30px rgba(2,6,23,0.6); }
+.login-card{ padding:1.25rem; border-radius:12px; background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%); border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 8px 30px rgba(2,6,23,0.6); }
 .title-row{ display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem; }
 .logo{ width:44px; height:44px; border-radius:8px; background:linear-gradient(135deg,#4f46e5,#06b6d4); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; }
 .app-name{ color: #fff; font-weight:600; }

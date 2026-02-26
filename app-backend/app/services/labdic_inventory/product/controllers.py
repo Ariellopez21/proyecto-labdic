@@ -20,7 +20,7 @@ class ProductController(Controller):
     path = "/products"
     tags = ["products"]
     return_dto = ProductReadDTO
-    dependencies = {"products_repo": Provide(provide_product_repository)}
+    dependencies = {"products_repo": Provide(provide_product_repository, sync_to_thread=False)}
     exception_handlers = {NotFoundError: not_found_error_handler}
 
     @get(path="/", summary="ListProducts")
@@ -38,7 +38,7 @@ class ProductController(Controller):
         path="/",
         summary="CreateProduct",
         dto=ProductCreateDTO,
-        dependencies={"products_repo": Provide(provide_product_repository)},
+        dependencies={"products_repo": Provide(provide_product_repository, sync_to_thread=False)},
     )
     async def create(
         self,

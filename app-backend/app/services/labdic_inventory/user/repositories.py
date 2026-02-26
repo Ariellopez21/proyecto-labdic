@@ -12,11 +12,16 @@ password_hasher = PasswordHash.recommended()
 
 
 class UserRepository(SQLAlchemySyncRepository[User]):
+    """Repositorio para operaciones CRUD de usuarios.
+
+    Extiende SQLAlchemySyncRepository con métodos personalizados
+    para manejo de roles y autenticación.
+    """
+
     model_type = User
 
-    '''Get my User'''
     def get_my_user(self, username: str) -> User:
-        """Get the current user."""
+        """Obtiene un usuario por su username con todas sus relaciones cargadas."""
         stmt = (
             select(User)
             .options(selectinload(User.roles))
@@ -26,16 +31,20 @@ class UserRepository(SQLAlchemySyncRepository[User]):
         )
         return self.session.execute(stmt).scalar_one()
 
-    '''Models Users & Roles + Auth Controllers'''
     def add_with_existing_roles(
         self, roles_repo: RoleRepository,
         user: User,
         **kwargs
     ) -> User:
-        '''Hashing the password before saving the user.'''
+        """Crea un usuario hasheando su contraseña y asignando roles existentes por ID.
+
+        Models: Users & Roles + Auth Controllers
+        """
+
+        # Hashing the password before saving the user.
         user.password = password_hasher.hash(user.password)
 
-        """Add a user with existing roles, matching by id."""
+        # Add a user with existing roles, matching by id.
         user.roles = roles_repo.list(
             CollectionFilter(
                 field_name="id",
@@ -51,6 +60,7 @@ class UserRepository(SQLAlchemySyncRepository[User]):
         self, roles_repo: RoleRepository, user_id: int, user_data: DTOData[User], **kwargs
     ) -> User:
         """Update a user using existing roles, matching by id."""
+
         user_data_dict = user_data.as_builtins()
 
         if "roles" in user_data_dict:
@@ -75,7 +85,7 @@ class UserRepository(SQLAlchemySyncRepository[User]):
 
         return password_hasher.verify(password, user.password)
 
-async def provide_user_repository(db_session: Session) -> UserRepository:
+def provide_user_repository(db_session: Session) -> UserRepository:
     """
     Provide a SQLAlchemySyncRepository for User.
     """

@@ -20,7 +20,7 @@ class RoleController(Controller):
     path = "/roles"
     tags = ["roles"]
     return_dto = RoleReadDTO
-    dependencies = {"roles_repo": Provide(provide_role_repository)}
+    dependencies = {"roles_repo": Provide(provide_role_repository, sync_to_thread=False)}
     exception_handlers = {NotFoundError: not_found_error_handler}
 
     @get(path="/", summary="ListRoles")

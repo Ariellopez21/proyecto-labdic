@@ -16,13 +16,20 @@ from ..role.repositories import RoleRepository, provide_role_repository
 from .dtos import UserCreateDTO, UserReadDTO, UserUpdateDTO
 from .repositories import UserRepository, provide_user_repository
 
+# GUARDS
 
 def admin_user_guard(connection: ASGIConnection, _: BaseRouteHandler) -> None:
+    """Guard que restringe el acceso a administradores."""
     if not connection.user.is_admin:
         raise HTTPException(
             status_code=403,
             detail="Not authorized.",
         )
+
+def require_active(connection: ASGIConnection, _: BaseRouteHandler) -> None:
+    """Guard que restringe el acceso a usuarios inactivos."""
+    if not connection.user.is_active:
+        raise HTTPException(status_code=403, detail="Cuenta de usuario inactiva.")
 
 def not_found_error_handler(_: Request[Any, Any, Any], __: NotFoundError) -> Response[Any]:
     return Response(status_code=404, content={"status_code": 404, "detail": "User not found"})
@@ -30,9 +37,10 @@ def not_found_error_handler(_: Request[Any, Any, Any], __: NotFoundError) -> Res
 
 class UserController(Controller):
     path = "/users"
+    guards = [require_active]   # Requiere que el usuario este activo para ejecutar CRUDs.
     tags = ["users"]
     return_dto = UserReadDTO
-    dependencies = {"users_repo": Provide(provide_user_repository)}
+    dependencies = {"users_repo": Provide(provide_user_repository, sync_to_thread=False)}
     exception_handlers = {NotFoundError: not_found_error_handler}
 
     @get("/me")
@@ -55,7 +63,7 @@ class UserController(Controller):
         summary="CreateUser",
         dto=UserCreateDTO,
         guards=[admin_user_guard],
-        dependencies={"roles_repo": Provide(provide_role_repository)},
+        dependencies={"roles_repo": Provide(provide_role_repository, sync_to_thread=False)},
     )
     async def create(
         self,
@@ -71,7 +79,7 @@ class UserController(Controller):
         summary="UpdateUser",
         dto=UserUpdateDTO,
         guards=[admin_user_guard],
-        dependencies={"roles_repo": Provide(provide_role_repository)},
+        dependencies={"roles_repo": Provide(provide_role_repository, sync_to_thread=False)},
     )
     async def update(
         self,

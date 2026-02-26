@@ -1,3 +1,4 @@
+# Parche 1.2
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
@@ -31,8 +32,8 @@ class User(Base):
     phone: Mapped[str] = mapped_column(String(18), nullable=True)
     address: Mapped[str] = mapped_column(String(360), nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
-    is_active: Mapped[bool] = mapped_column(default=True, nullable=True)
-    is_admin: Mapped[bool] = mapped_column(default=False, nullable=True)
+    is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
+    is_admin: Mapped[bool] = mapped_column(default=False, nullable=False)
 
     roles: Mapped[list["Role"]] = relationship("Role", secondary=user_roles, back_populates="users")
     loan_requests: Mapped[list["LoanRequest"]] = relationship("LoanRequest", back_populates="user")
@@ -91,7 +92,6 @@ class Product(Base):
     model_id: Mapped[int] = mapped_column(ForeignKey("models.id"), nullable=True)
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=True)
     description: Mapped[str] = mapped_column(String(500), nullable=True)
-    available_stock: Mapped[int] = mapped_column()
     is_active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
 

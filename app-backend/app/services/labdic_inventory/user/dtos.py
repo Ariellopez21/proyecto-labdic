@@ -11,7 +11,7 @@ class UserReadDTO(SQLAlchemyDTO[User]):
 class UserCreateDTO(SQLAlchemyDTO[User]):
     config = SQLAlchemyDTOConfig(
         exclude={"id", "created_at", "loan_requests", "status_logs"},
-        partial=True
+        partial=False
     )
 
 class UserUpdateDTO(SQLAlchemyDTO[User]):

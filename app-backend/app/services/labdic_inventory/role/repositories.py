@@ -7,7 +7,7 @@ from app.models.inventory import Role
 class RoleRepository(SQLAlchemySyncRepository[Role]):
     model_type = Role
 
-async def provide_role_repository(db_session: Session) -> RoleRepository:
+def provide_role_repository(db_session: Session) -> RoleRepository:
     """
     Provide a SQLAlchemySyncRepository for Role.
     """

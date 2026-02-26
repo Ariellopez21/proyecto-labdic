@@ -21,7 +21,7 @@ class AuthController(Controller):
     @post(
         "/login",
         dto=UserLoginDTO,
-        dependencies={"users_repo": Provide(provide_user_repository)},
+        dependencies={"users_repo": Provide(provide_user_repository, sync_to_thread=False)},
     )
     async def login(
         self,

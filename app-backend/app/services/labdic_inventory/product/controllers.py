@@ -1,3 +1,5 @@
+# app/services/labdic_inventory/product/controllers.py
+
 from typing import Any, Sequence
 
 from advanced_alchemy.exceptions import NotFoundError
@@ -7,8 +9,7 @@ from litestar.dto import DTOData
 
 from app.models.inventory import Product
 
-# Esta es la forma de importar para colaborar con otro repositorio
-from .dtos import ProductCreateDTO, ProductReadDTO
+from .dtos import ProductCreateDTO, ProductReadDTO, ProductUpdateDTO
 from .repositories import ProductRepository, provide_product_repository
 
 
@@ -33,20 +34,23 @@ class ProductController(Controller):
         """Get a product by ID."""
         return products_repo.get_one(id=product_id)
 
-    # Arreglar para que al crear usuario se le asignen roles.
-    @post(
-        path="/",
-        summary="CreateProduct",
-        dto=ProductCreateDTO,
-        dependencies={"products_repo": Provide(provide_product_repository, sync_to_thread=False)},
-    )
-    async def create(
-        self,
-        data: Product,
-        products_repo: ProductRepository,
-    ) -> Product:
+    @post(path="/", summary="CreateProduct", dto=ProductCreateDTO)
+    async def create(self, data: Product, products_repo: ProductRepository) -> Product:
         """Create a new product."""
         return products_repo.add(data, auto_commit=True)
+
+    @patch(path="/{product_id:int}", summary="UpdateProduct", dto=ProductUpdateDTO)
+    async def update(
+        self, product_id: int, data: DTOData[Product], products_repo: ProductRepository
+    ) -> Product:
+        """Update an existing product."""
+        product, _ = products_repo.get_and_update(
+            id=product_id,
+            **data.as_builtins(),
+            match_fields=["id"],
+            auto_commit=True,
+        )
+        return product
 
     @delete(path="/{product_id:int}", summary="DeleteProduct")
     async def delete(self, product_id: int, products_repo: ProductRepository) -> None:

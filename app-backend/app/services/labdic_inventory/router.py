@@ -1,6 +1,16 @@
+# app/services/labdic_inventory/router.py
+
 from litestar import Router
 
 from .auth.controllers import AuthController
+from .catalog.controllers import (
+    BrandController,
+    CategoryController,
+    ModelController,
+    StatusController,
+    UbicationController,
+)
+from .device.controllers import DeviceController
 from .product.controllers import ProductController
 from .role.controllers import RoleController
 from .user.controllers import UserController
@@ -11,6 +21,12 @@ labdic_inventory_router = Router(
         UserController,
         RoleController,
         AuthController,
-        #ProductController,
+        ProductController,
+        BrandController,
+        CategoryController,
+        ModelController,
+        StatusController,
+        UbicationController,
+        DeviceController,
     ],
 )

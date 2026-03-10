@@ -197,8 +197,6 @@ class DeviceStatusLog(Base):
     timestamp: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
     # Usuario que realizó el cambio
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    # Comentario opcional sobre el cambio de estado
-    comment: Mapped[str] = mapped_column(String(500), nullable=True)
 
     user: Mapped["User"] = relationship("User", back_populates="status_logs")
     device: Mapped["Device"] = relationship("Device", back_populates="status_logs")

@@ -5,6 +5,7 @@ from app.models.inventory import Product
 
 
 class ProductRepository(SQLAlchemySyncRepository[Product]):
+    """Repositorio para operaciones CRUD de productos."""
     model_type = Product
 
 def provide_product_repository(db_session: Session) -> ProductRepository:

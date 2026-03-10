@@ -81,7 +81,11 @@ class Category(Base):
     products: Mapped[list["Product"]] = relationship("Product", back_populates="category")
 
 class Product(Base):
-    """Product model for managing products in the inventory."""
+    """Representa un tipo de producto del inventario (ej: Notebook, Arduino Uno).
+
+    Cada Product puede tener múltiples Device asociados,
+    donde cada Device es una unidad física individual.
+    """
 
     __tablename__ = "products"
 

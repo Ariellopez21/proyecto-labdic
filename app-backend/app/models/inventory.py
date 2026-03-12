@@ -1,7 +1,7 @@
 # Parche 1.2
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Table
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from . import Base
@@ -11,12 +11,13 @@ dispositivos en el Laboratorio del Departamento de Ingeniería en Computación (
 
 
 # Tabla intermedia para la relación M-M entre usuarios y roles
-user_roles = Table(
-    "user_roles",
-    Base.metadata,
-    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("role_id", Integer, ForeignKey("roles.id"), primary_key=True),
-)
+class UserRole(Base):
+    """Tabla intermedia entre usuarios y roles."""
+
+    __tablename__ = "user_roles"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), primary_key=True)
 
 class User(Base):
     """Control de acceso y autenticación de usuarios."""
@@ -35,7 +36,7 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
     is_admin: Mapped[bool] = mapped_column(default=False, nullable=False)
 
-    roles: Mapped[list["Role"]] = relationship("Role", secondary=user_roles, back_populates="users")
+    roles: Mapped[list["Role"]] = relationship("Role", secondary="user_roles", back_populates="users")
     loan_requests: Mapped[list["LoanRequest"]] = relationship("LoanRequest", back_populates="user")
     status_logs: Mapped[list["DeviceStatusLog"]] = relationship("DeviceStatusLog", back_populates="user")
 
@@ -48,7 +49,7 @@ class Role(Base):
     name: Mapped[str] = mapped_column(String(50), unique=True)
     description: Mapped[str] = mapped_column(String(255), nullable=True)
 
-    users: Mapped[list["User"]] = relationship("User", secondary=user_roles, back_populates="roles")
+    users: Mapped[list["User"]] = relationship("User", secondary="user_roles", back_populates="roles")
 
 class Brand(Base):
     """Brand model for product brands."""

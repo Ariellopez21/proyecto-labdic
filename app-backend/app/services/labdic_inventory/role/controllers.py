@@ -4,6 +4,7 @@ from advanced_alchemy.exceptions import NotFoundError
 from litestar import Controller, Request, Response, delete, get, patch, post
 from litestar.di import Provide
 from litestar.dto import DTOData
+from litestar.exceptions import HTTPException
 
 from app.models.inventory import Role
 
@@ -11,6 +12,7 @@ from app.models.inventory import Role
 from .dtos import RoleCreateDTO, RoleReadDTO, RoleUpdateDTO
 from .repositories import RoleRepository, provide_role_repository
 
+PROTECTED_ROLES = {"usuario"}
 
 def not_found_error_handler(_: Request[Any, Any, Any], __: NotFoundError) -> Response[Any]:
     return Response(status_code=404, content={"status_code": 404, "detail": "User not found"})
@@ -58,5 +60,10 @@ class RoleController(Controller):
 
     @delete(path="/{role_id:int}", summary="DeleteRole")
     async def delete(self, role_id: int, roles_repo: RoleRepository) -> None:
-        """Delete a role by ID."""
+        role = roles_repo.get_one(id=role_id)
+        if role.name in PROTECTED_ROLES:
+            raise HTTPException(
+                status_code=409,
+                detail=f"El rol '{role.name}' es un rol del sistema y no puede eliminarse.",
+            )
         roles_repo.delete(role_id, auto_commit=True)

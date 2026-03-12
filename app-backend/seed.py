@@ -89,12 +89,14 @@ def seed_roles(session: Session) -> list[Role]:
 
 def seed_statuses(session: Session) -> None:
     statuses = [
-        Status(name="available"),
-        Status(name="borrowed"),
-        Status(name="under_maintenance"),
-        Status(name="pending"),
-        Status(name="approved"),
-        Status(name="rejected"),
+        # Estados de dispositivos
+        Status(name="disponible"),
+        Status(name="prestado"),
+        Status(name="en_mantenimiento"),
+        # Estados de solicitudes
+        Status(name="pendiente"),
+        Status(name="aprobado"),
+        Status(name="rechazado"),
     ]
     session.add_all(statuses)
     print("  ✓ Statuses insertados")
@@ -271,7 +273,7 @@ def run() -> None:
             clear_db(session)
 
             # Nivel 1 — sin dependencias
-            roles = seed_roles(session)   # retorna roles para seed_users
+            roles = seed_roles(session)
             seed_statuses(session)
             seed_brands(session)
             seed_models(session)

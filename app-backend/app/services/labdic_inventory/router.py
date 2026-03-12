@@ -11,6 +11,7 @@ from .catalog.controllers import (
     UbicationController,
 )
 from .device.controllers import DeviceController
+from .loan.controllers import LoanRequestController
 from .product.controllers import ProductController
 from .role.controllers import RoleController
 from .user.controllers import UserController
@@ -28,5 +29,6 @@ labdic_inventory_router = Router(
         StatusController,
         UbicationController,
         DeviceController,
+        LoanRequestController,
     ],
 )

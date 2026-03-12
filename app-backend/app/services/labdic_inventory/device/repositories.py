@@ -7,7 +7,7 @@ from advanced_alchemy.repository import SQLAlchemySyncRepository
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from app.models.inventory import Device, DeviceStatusLog
+from app.models.inventory import Device, DeviceStatusLog, Status
 
 
 class DeviceRepository(SQLAlchemySyncRepository[Device]):
@@ -52,6 +52,20 @@ class DeviceRepository(SQLAlchemySyncRepository[Device]):
         self.session.commit()
 
         return device
+
+    def list_available(self) -> Sequence[Device]:
+        """Retorna todos los dispositivos con estado 'disponible'."""
+        stmt = (
+            select(Device)
+            .options(
+                selectinload(Device.product),
+                selectinload(Device.status),
+                selectinload(Device.ubication),
+            )
+            .join(Device.status)
+            .where(Status.name == "disponible")
+        )
+        return list(self.session.execute(stmt).scalars().all())
 
 
 class DeviceStatusLogRepository(SQLAlchemySyncRepository[DeviceStatusLog]):

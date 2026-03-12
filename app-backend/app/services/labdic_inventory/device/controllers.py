@@ -41,6 +41,11 @@ class DeviceController(Controller):
         """Lista todos los dispositivos."""
         return devices_repo.list()
 
+    @get(path="/available", summary="ListAvailableDevices")
+    async def list_available(self, devices_repo: DeviceRepository) -> Sequence[Device]:
+        """Lista todos los dispositivos disponibles para préstamo."""
+        return devices_repo.list_available()
+
     @get(path="/{device_id:int}", summary="GetDevice")
     async def fetch(self, device_id: int, devices_repo: DeviceRepository) -> Device:
         """Obtiene un dispositivo por ID con sus relaciones."""

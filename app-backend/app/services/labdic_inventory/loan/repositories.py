@@ -1,7 +1,6 @@
 # app/services/labdic_inventory/loan/repositories.py
 
 from datetime import datetime, timezone
-from typing import Sequence
 
 from advanced_alchemy.repository import SQLAlchemySyncRepository
 from sqlalchemy import select

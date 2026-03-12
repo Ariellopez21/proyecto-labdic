@@ -1,6 +1,6 @@
 # app/services/labdic_inventory/loan/dtos.py
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 
 from advanced_alchemy.extensions.litestar import SQLAlchemyDTOConfig

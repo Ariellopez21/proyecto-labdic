@@ -10,6 +10,10 @@ from app.config import settings
 from app.models.inventory import (
     Brand,
     Category,
+    Device,
+    DeviceStatusLog,
+    LoanRequest,
+    LoanRequestItem,
     Model,
     Product,
     Role,
@@ -57,10 +61,10 @@ Estos modelos no se siembran aquí porque requieren datos específicos o se gene
 """
 
 def clear_db(session: Session) -> None:
-    #session.query(DeviceStatusLog).delete()   # depende de Device, User, Status
-    #session.query(LoanRequestItem).delete()   # depende de LoanRequest, Device
-    #session.query(LoanRequest).delete()       # depende de User, Status
-    #session.query(Device).delete()            # depende de Product, Status, Ubication
+    session.query(DeviceStatusLog).delete()   # depende de Device, User, Status
+    session.query(LoanRequestItem).delete()   # depende de LoanRequest, Device
+    session.query(LoanRequest).delete()       # depende de User, Status
+    session.query(Device).delete()            # depende de Product, Status, Ubication
     session.query(UserRole).delete()          # depende de User, Role
     session.query(Product).delete()           # depende de Brand, Model, Category
     session.query(User).delete()              # depende de Role (via UserRole, ya limpia)
@@ -266,6 +270,156 @@ def seed_products(session: Session) -> None:
 
     print("  ✓ Products insertados")
 
+# --- NIVEL 3 ---
+
+def seed_devices(session: Session) -> list[Device]:
+    def get_product(name: str) -> Product:
+        return session.query(Product).filter_by(name=name).one()
+
+    def get_status(name: str) -> Status:
+        return session.query(Status).filter_by(name=name).one()
+
+    def get_ubication(name: str) -> Ubication:
+        return session.query(Ubication).filter_by(name=name).one()
+
+    with session.no_autoflush:
+        devices = [
+            # Laptop Dell XPS 13 — 2 unidades
+            Device(
+                product=get_product("Laptop Dell XPS 13"),
+                internal_code="DELL-XPS-001",
+                serial_number="SN-DXPS-001",
+                status=get_status("disponible"),
+                ubication=get_ubication("TI-1"),
+                created_at=datetime.now(timezone.utc),
+            ),
+            Device(
+                product=get_product("Laptop Dell XPS 13"),
+                internal_code="DELL-XPS-002",
+                serial_number="SN-DXPS-002",
+                status=get_status("disponible"),
+                ubication=get_ubication("TI-1"),
+                created_at=datetime.now(timezone.utc),
+            ),
+            # Laptop HP EliteBook 840 — 2 unidades
+            Device(
+                product=get_product("Laptop HP EliteBook 840"),
+                internal_code="HP-ELB-001",
+                serial_number="SN-HELB-001",
+                status=get_status("disponible"),
+                ubication=get_ubication("TI-2"),
+                created_at=datetime.now(timezone.utc),
+            ),
+            Device(
+                product=get_product("Laptop HP EliteBook 840"),
+                internal_code="HP-ELB-002",
+                serial_number="SN-HELB-002",
+                status=get_status("disponible"),
+                ubication=get_ubication("TI-2"),
+                created_at=datetime.now(timezone.utc),
+            ),
+            # Laptop Lenovo ThinkPad X1 Carbon — 2 unidades
+            Device(
+                product=get_product("Laptop Lenovo ThinkPad X1 Carbon"),
+                internal_code="LEN-TPX1-001",
+                serial_number="SN-LTPX1-001",
+                status=get_status("disponible"),
+                ubication=get_ubication("TI-1"),
+                created_at=datetime.now(timezone.utc),
+            ),
+            Device(
+                product=get_product("Laptop Lenovo ThinkPad X1 Carbon"),
+                internal_code="LEN-TPX1-002",
+                serial_number="SN-LTPX1-002",
+                status=get_status("disponible"),
+                ubication=get_ubication("TI-2"),
+                created_at=datetime.now(timezone.utc),
+            ),
+            # Tablet Samsung Galaxy Tab S8 — 2 unidades
+            Device(
+                product=get_product("Tablet Samsung Galaxy Tab S8"),
+                internal_code="SAM-GTS8-001",
+                serial_number="SN-SGTS8-001",
+                status=get_status("disponible"),
+                ubication=get_ubication("Administración"),
+                created_at=datetime.now(timezone.utc),
+            ),
+            Device(
+                product=get_product("Tablet Samsung Galaxy Tab S8"),
+                internal_code="SAM-GTS8-002",
+                serial_number="SN-SGTS8-002",
+                status=get_status("disponible"),
+                ubication=get_ubication("Administración"),
+                created_at=datetime.now(timezone.utc),
+            ),
+        ]
+        session.add_all(devices)
+
+    print("  ✓ Devices insertados")
+    return devices
+
+
+# --- NIVEL 4 ---
+
+def seed_loans(session: Session, devices: list[Device]) -> None:
+    def get_user(username: str) -> User:
+        return session.query(User).filter_by(username=username).one()
+
+    def get_status(name: str) -> Status:
+        return session.query(Status).filter_by(name=name).one()
+
+    with session.no_autoflush:
+        usuario = get_user("juanperez")
+        print(f"  → Usuario encontrado: {usuario.name}")
+
+        # Préstamo 1 — pendiente (1 Dell XPS 13)
+        loan_pendiente = LoanRequest(
+            user=usuario,
+            status=get_status("pendiente"),
+            reason="Proyecto de redes semestre 1",
+            estimated_return_date=datetime(2026, 4, 1, tzinfo=timezone.utc),
+            request_date=datetime.now(timezone.utc),
+        )
+        session.add(loan_pendiente)
+        session.flush()
+        session.add(LoanRequestItem(loan_request=loan_pendiente, device=devices[0]))
+        print("  → Préstamo #1 creado: estado='pendiente'")
+        print(f"     - Item: {devices[0].internal_code} ({devices[0].serial_number})")
+
+        # Préstamo 2 — aprobado (1 HP EliteBook)
+        loan_aprobado = LoanRequest(
+            user=usuario,
+            status=get_status("aprobado"),
+            reason="Taller de programación",
+            estimated_return_date=datetime(2026, 4, 15, tzinfo=timezone.utc),
+            request_date=datetime.now(timezone.utc),
+        )
+        session.add(loan_aprobado)
+        session.flush()
+        session.add(LoanRequestItem(loan_request=loan_aprobado, device=devices[2]))
+        print("  → Préstamo #2 creado: estado='aprobado'")
+        print(f"     - Item: {devices[2].internal_code} ({devices[2].serial_number})")
+
+        # Préstamo 3 — prestado/entregado (1 Lenovo ThinkPad)
+        devices[4].status = get_status("prestado")
+        print(f"  → Device actualizado a 'prestado': {devices[4].internal_code}")
+        loan_prestado = LoanRequest(
+            user=usuario,
+            status=get_status("prestado"),
+            reason="Presentación de proyecto final",
+            estimated_return_date=datetime(2026, 3, 20, tzinfo=timezone.utc),
+            request_date=datetime.now(timezone.utc),
+            delivery_date=datetime.now(timezone.utc),
+        )
+        session.add(loan_prestado)
+        session.flush()
+        session.add(LoanRequestItem(loan_request=loan_prestado, device=devices[4]))
+        print("  → Préstamo #3 creado: estado='prestado'")
+        print(f"     - Item: {devices[4].internal_code} ({devices[4].serial_number})")
+        print(f"     - Entregado el: {loan_prestado.delivery_date.strftime('%Y-%m-%d %H:%M')}")
+
+    print("  ✓ Loans insertados")
+
 def run() -> None:
     print("\n🌱 Iniciando seed de la base de datos...\n")
     with Session(engine) as session:
@@ -279,13 +433,19 @@ def run() -> None:
             seed_models(session)
             seed_categories(session)
             seed_ubications(session)
-
-            # flush para que nivel 1 tenga IDs antes del nivel 2
             session.flush()
 
             # Nivel 2 — depende del nivel 1
             seed_users(session, roles)
             seed_products(session)
+            session.flush()
+
+            # Nivel 3 — depende del nivel 2
+            devices = seed_devices(session)
+            session.flush()
+
+            # Nivel 4 — depende del nivel 3
+            seed_loans(session, devices)
 
             session.commit()
             print("\n✅ Seed completado exitosamente.\n")
@@ -293,7 +453,6 @@ def run() -> None:
             session.rollback()
             print(f"\n❌ Error durante el seed, rollback ejecutado: {e}\n")
             raise
-
 
 if __name__ == "__main__":
     run()

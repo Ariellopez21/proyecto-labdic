@@ -8,6 +8,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppLayout: typeof import('./src/components/layout/AppLayout.vue')['default']
+    AppSidebar: typeof import('./src/components/layout/AppSidebar.vue')['default']
+    AppTopbar: typeof import('./src/components/layout/AppTopbar.vue')['default']
+    AuthLayout: typeof import('./src/components/layout/AuthLayout.vue')['default']
     BaseHeader: typeof import('./src/components/base/BaseHeader.vue')['default']
     Button: typeof import('primevue/button')['default']
     Card: typeof import('primevue/card')['default']

@@ -8,8 +8,8 @@ import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Card from 'primevue/card'
-import type { Role } from '@/interfaces/Role'
-import { getRoles, createRole, updateRole, deleteRole } from '@/api/roles'
+import type { Role } from '@/types/role.types'
+import { getRoles, createRole, updateRole, deleteRole } from '@/services/role.service'
 
 const toast = useToast()
 

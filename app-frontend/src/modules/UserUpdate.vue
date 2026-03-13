@@ -2,11 +2,11 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
-import UserForm from '@/components/forms/UserForm.vue'
-import { getUser, updateUser } from '@/api/users'
-import type { User, NewUserPayload } from '@/interfaces/User'
-import { useAuthStore } from '@/stores/auth'
-import { useUserStore } from '@/stores/user'
+import UserForm from '@/modules/users/components/UserForm.vue'
+import { getUser, updateUser } from '@/services/user.service'
+import type { User, NewUserPayload } from '@/types/user.types'
+import { useAuthStore } from '@/stores/auth.store'
+import { useUserStore } from '@/stores/user.store'
 
 const route = useRoute()  // Para rastrear la id a través de la URL
 const router = useRouter() // Para redirigir después de guardar

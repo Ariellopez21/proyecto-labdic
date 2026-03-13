@@ -1,8 +1,8 @@
 // src/api/index.ts
 import * as changeKeys from 'change-case/keys'
 
-import { useAuthStore } from "../stores/auth"
-import { useUserStore } from '../stores/user'
+import { useAuthStore } from "../stores/auth.store"
+import { useUserStore } from '../stores/user.store'
 import { useRouter } from 'vue-router'
 
 export const BASE_URL = 'http://localhost:8000'

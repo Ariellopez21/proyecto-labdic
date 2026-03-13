@@ -1,8 +1,8 @@
 // src/stores/user.ts
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type { User } from "@/interfaces/User";
-import type { Role } from "@/interfaces/Role";
+import type { User } from "@/types/user.types";
+import type { Role } from "@/types/role.types";
 
 /**
  * Stores information about the currently authenticated user.

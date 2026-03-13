@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { getUsers, deleteUser } from '@/api/users'
-import type { User } from '@/interfaces/User'
+import { getUsers, deleteUser } from '@/services/user.service'
+import type { User } from '@/types/user.types'
 import { ref, type Ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { useUserStore } from '@/stores/user.store'
 import { useToast } from 'primevue/usetoast'
-import UserDetailsDialog from '@/components/dialogs/UserDetailsDialog.vue'
-import UserDeleteConfirmDialog from '@/components/dialogs/UserDeleteConfirmDialog.vue'
+import UserDetailsDialog from '@/modules/users/components/UserDetailsDialog.vue'
+import UserDeleteConfirmDialog from '@/modules/users/components/UserDeleteConfirmDialog.vue'
 
 /* =============== STORES =============== */
 const user = useUserStore()

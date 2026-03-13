@@ -1,6 +1,6 @@
 // src/api/roles.ts
-import type { Role } from '@/interfaces/Role'
-import { apiFetch } from '.'
+import type { Role } from '@/types/role.types'
+import { apiFetch } from './api'
 
 const ROLES = '/labdic_inventory/roles'
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import UserForm from '@/components/forms/UserForm.vue'
+import UserForm from '@/modules/users/components/UserForm.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
-import type { NewUserPayload } from '@/interfaces/User'
-import { createUser } from '@/api/users'
+import type { NewUserPayload } from '@/types/user.types'
+import { createUser } from '@/services/user.service'
 
 const router = useRouter()
 const toast = useToast()

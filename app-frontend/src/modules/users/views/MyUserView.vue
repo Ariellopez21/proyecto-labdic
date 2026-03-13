@@ -2,8 +2,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
-import type { User } from '@/interfaces/User'
-import { getMyUser } from '@/api/users'
+import type { User } from '@/types/user.types'
+import { getMyUser } from '@/services/user.service'
 
 const toast = useToast()
 const myUser = ref<User | null>(null)

@@ -1,6 +1,6 @@
 // src/api/auth.ts
-import type { Token } from '@/interfaces/Auth'
-import { apiFetch } from '@/api/index'
+import type { Token } from '@/types/auth.types'
+import { apiFetch } from '@/services/api'
 
 // Base path for auth-related API endpoints
 const AUTH = '/labdic_inventory/auth'

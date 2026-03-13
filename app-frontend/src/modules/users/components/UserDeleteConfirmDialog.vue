@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { User } from '@/interfaces/User'
+import type { User } from '@/types/user.types'
 
 interface Props {
   modelValue: boolean

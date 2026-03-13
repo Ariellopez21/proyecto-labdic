@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { getMyUser } from '@/api/users';
-import { login } from '@/api/auth';
+import { getMyUser } from '@/services/user.service';
+import { login } from '@/services/auth.service';
 import { useAuthStore } from '../stores/auth';
 import { useUserStore } from '../stores/user';
 import { ref } from 'vue';

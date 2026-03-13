@@ -1,6 +1,6 @@
 // src/api/users.ts
-import type { User, NewUserPayload, UpdateUserPayload } from '@/interfaces/User'
-import { apiFetch } from '@/api/index'
+import type { User, NewUserPayload, UpdateUserPayload } from '@/types/user.types'
+import { apiFetch } from '@/services/api'
 
 
 // Base path for user-related API endpoints

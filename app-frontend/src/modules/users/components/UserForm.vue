@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue'
 import { useToast } from 'primevue/usetoast'
-import type { NewUserPayload } from '@/interfaces/User'
-import type { Role } from '@/interfaces/Role'
-import { getRoles } from '@/api/roles'
+import type { NewUserPayload } from '@/types/user.types'
+import type { Role } from '@/types/role.types'
+import { getRoles } from '@/services/role.service'
 
 interface Props {
   modelValue?: NewUserPayload | null

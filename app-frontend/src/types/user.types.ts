@@ -1,5 +1,5 @@
 // src/interfaces/User.ts
-import type { Role } from './Role'
+import type { Role } from './role.types'
 
 /*
   UserBase

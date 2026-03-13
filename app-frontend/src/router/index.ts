@@ -9,8 +9,8 @@ import UserUpdate from '@/views/UserUpdate.vue'
 import MyUserView from '@/views/MyUserView.vue'
 import AdminRolesView from '@/views/AdminRolesView.vue'
 
-import { useAuthStore } from '@/stores/auth'
-import { useUserStore } from '@/stores/user'
+import { useAuthStore } from '@/stores/auth.store'
+import { useUserStore } from '@/stores/user.store'
 
 const routes: RouteRecordRaw[] = [
   {

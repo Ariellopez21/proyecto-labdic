@@ -1,3 +1,5 @@
+# app/services/labdic_inventory/user/repositories.py
+
 from advanced_alchemy.filters import CollectionFilter
 from advanced_alchemy.repository import SQLAlchemySyncRepository
 from litestar.dto import DTOData

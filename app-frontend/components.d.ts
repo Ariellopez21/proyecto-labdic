@@ -24,16 +24,20 @@ declare module 'vue' {
     copy: typeof import('./src/components/dialogs/UserDetailsDialog copy.vue')['default']
     DataTable: typeof import('primevue/datatable')['default']
     Dialog: typeof import('primevue/dialog')['default']
+    Divider: typeof import('primevue/divider')['default']
+    Drawer: typeof import('primevue/drawer')['default']
     EmptyState: typeof import('./src/components/EmptyState.vue')['default']
     FloatLabel: typeof import('primevue/floatlabel')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Label: typeof import('primevue/label')['default']
+    Menu: typeof import('primevue/menu')['default']
     Message: typeof import('primevue/message')['default']
     MultiSelect: typeof import('primevue/multiselect')['default']
     Password: typeof import('primevue/password')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Tag: typeof import('primevue/tag')['default']
     Textarea: typeof import('primevue/textarea')['default']
     Toast: typeof import('primevue/toast')['default']
     TodoStatsCards: typeof import('./src/components/TodoStatsCards.vue')['default']
@@ -43,5 +47,8 @@ declare module 'vue' {
     UserForm: typeof import('./src/components/forms/UserForm.vue')['default']
     UserUpdateDialog: typeof import('./src/components/forms/UserUpdateDialog.vue')['default']
     UserUpdateForm: typeof import('./src/components/forms/UserUpdateForm.vue')['default']
+  }
+  export interface GlobalDirectives {
+    Tooltip: typeof import('primevue/tooltip')['default']
   }
 }

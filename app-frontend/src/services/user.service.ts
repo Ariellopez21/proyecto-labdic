@@ -1,20 +1,28 @@
-// src/api/users.ts
+// src/services/user.service.ts
 import type { User, NewUserPayload, UpdateUserPayload } from '@/types/user.types'
 import { apiFetch } from '@/services/api'
 
-
-// Base path for user-related API endpoints
 const USERS = '/labdic_inventory/users'
 
-// Helper para mapear roleIds -> roles[{id}]
-function mapUserPayload<T extends { roleIds?: number[] }>(
+/**
+ * Convierte el payload del formulario al formato que espera el backend.
+ * El backend requiere roles como [{id, name}], no solo [{id}].
+ * Los roleIds vienen del formulario junto a rolesData (lookup completo).
+ */
+function mapUserPayload<T extends { roleIds?: number[], rolesData?: { id: number, name: string }[] }>(
   payload: T,
-): Omit<T, 'roleIds'> & { roles?: { id: number }[] } {
-  const { roleIds, ...rest } = payload
-  const roles =
-    roleIds && roleIds.length > 0
-      ? roleIds.map((id) => ({ id }))
-      : undefined
+): Omit<T, 'roleIds' | 'rolesData'> & { roles?: { id: number, name: string }[] } {
+  const { roleIds, rolesData, ...rest } = payload
+
+  // Si tenemos rolesData (con nombres), los usamos directamente
+  // Si no, mandamos solo ids (fallback, puede dar 400 en algunos casos)
+  let roles: { id: number, name: string }[] | undefined = undefined
+
+  if (rolesData && rolesData.length > 0) {
+    roles = rolesData
+  } else if (roleIds && roleIds.length > 0) {
+    roles = roleIds.map(id => ({ id, name: '' }))
+  }
 
   return { ...rest, roles }
 }
@@ -39,19 +47,14 @@ export async function createUser(payload: NewUserPayload): Promise<User> {
   })
 }
 
-export async function updateUser(
-  id: number,
-  payload: UpdateUserPayload,
-): Promise<User> {
+export async function updateUser(id: number, payload: UpdateUserPayload): Promise<User> {
   const body = mapUserPayload(payload)
   return await apiFetch<User>(`${USERS}/${id}`, {
-    method: 'PATCH',       // o 'PATCH' si tu backend usa PATCH
+    method: 'PATCH',
     json: body,
   })
 }
 
 export async function deleteUser(id: number): Promise<void> {
-  await apiFetch(`${USERS}/${id}`, {
-    method: 'DELETE',
-  })
+  await apiFetch(`${USERS}/${id}`, { method: 'DELETE' })
 }

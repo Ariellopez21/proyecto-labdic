@@ -1,3 +1,4 @@
+# app/services/labdic_inventory/user/dtos.py
 
 from advanced_alchemy.extensions.litestar import SQLAlchemyDTOConfig
 from litestar.plugins.sqlalchemy import SQLAlchemyDTO

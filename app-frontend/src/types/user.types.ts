@@ -1,22 +1,15 @@
-// src/interfaces/User.ts
+// src/types/user.types.ts
 import type { Role } from './role.types'
 
-/*
-  UserBase
-  Facilitar tipos parciales y evitar repetir campos comunes.
- */
-export interface UserBase {
-  id: number  // Borrarlo dsp.
+export interface User {
+  id: number
   username: string
-}
-
-export interface User extends UserBase {
   rut: string
   name: string
   email: string
   phone: string
   address: string
-  createdAt: Date
+  createdAt: string
   isAdmin: boolean
   isActive: boolean
   roles: Role[]
@@ -31,7 +24,9 @@ export interface NewUserPayload {
   address: string
   password: string
   isAdmin: boolean
-  roleIds?: number[]  // ids de roles seleccionados en el formulario
-  }
+  roleIds?: number[]
+  // Campo interno usado por mapUserPayload para enviar roles con nombre al backend
+  rolesData?: { id: number; name: string }[]
+}
 
 export type UpdateUserPayload = Partial<NewUserPayload>

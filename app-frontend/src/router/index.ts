@@ -1,71 +1,88 @@
 // src/router/index.ts
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-// Route components
-import HomeView from '@/views/HomeView.vue'
-import Login from '@/views/UserLogin.vue'
-import UserList from '@/views/UserList.vue'
-import UserCreate from '@/views/UserCreate.vue'
-import UserUpdate from '@/views/UserUpdate.vue'
-import MyUserView from '@/views/MyUserView.vue'
-import AdminRolesView from '@/views/AdminRolesView.vue'
+
+// Layouts
+import AppLayout  from '@/components/layout/AppLayout.vue'
+import AuthLayout from '@/components/layout/AuthLayout.vue'
+
+// Vistas — Auth
+import LoginView from '@/modules/auth/views/LoginView.vue'
+
+// Vistas — App (todos los usuarios)
+import HomeView   from '@/modules/HomeView.vue'
+import MyUserView from '@/modules/users/views/MyUserView.vue'
+
+// Vistas — Admin
+import UsersListView  from '@/modules/users/views/UsersListView.vue'
+import AdminRolesView from '@/modules/users/views/AdminRolesView.vue'
 
 import { useAuthStore } from '@/stores/auth.store'
 import { useUserStore } from '@/stores/user.store'
 
 const routes: RouteRecordRaw[] = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomeView,
-    meta: { requiresAuth: true },
-  },
+
+  // ── Rutas públicas (sin sidebar) ──────────────────────────────────
   {
     path: '/login',
-    name: 'login',
-    component: Login,
+    component: AuthLayout,
+    children: [
+      {
+        path: '',
+        name: 'login',
+        component: LoginView,
+      },
+    ],
   },
+
+  // ── Rutas privadas (con AppLayout: sidebar + topbar) ──────────────
   {
-    path: '/users',
-    name: 'users-list',
-    component: UserList,
-    meta: { requiresAuth: true, requiresAdmin: true },
-  },
-  {
-    path: '/users/create',
-    name: 'new-user',
-    component: UserCreate,
-    meta: { requiresAuth: true, requiresAdmin: true },
-  },
-  {
-    path: '/users/update/:id',
-    name: 'update-user',
-    component: UserUpdate,
-    meta: { requiresAuth: true, requiresAdmin: true },
-  },
-  {
-    path: '/me',
-    name: 'my-user',
-    component: MyUserView,
+    path: '/',
+    component: AppLayout,
     meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'home',
+        component: HomeView,
+      },
+      {
+        path: 'me',
+        name: 'my-profile',
+        component: MyUserView,
+      },
+
+      // Admin — Usuarios
+      {
+        path: 'admin/users',
+        name: 'admin-users',
+        component: UsersListView,
+        meta: { requiresAdmin: true },
+      },
+      {
+        path: 'admin/roles',
+        name: 'admin-roles',
+        component: AdminRolesView,
+        meta: { requiresAdmin: true },
+      },
+
+      // Fases futuras — se agregan aquí:
+      // { path: 'catalog',           name: 'catalog',          component: ... }
+      // { path: 'my-loans',          name: 'my-loans',         component: ... }
+      // { path: 'admin/products',    name: 'admin-products',   component: ... }
+      // { path: 'admin/devices',     name: 'admin-devices',    component: ... }
+      // { path: 'admin/loans',       name: 'admin-loans',      component: ... }
+      // { path: 'admin/catalog',     name: 'admin-catalog',    component: ... }
+    ],
   },
-  {
-  path: '/admin/roles',
-  name: 'admin-roles',
-  component: AdminRolesView,
-  meta: { requiresAuth: true, requiresAdmin: true },
-  },
+
+  // ── Catch-all ─────────────────────────────────────────────────────
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     redirect: (to) => ({
       name: 'home',
-      query: {
-        ...to.query,
-        nf: '1',          // flag de "not found"
-        from: to.fullPath // opcional: de dónde venía
-      },
+      query: { nf: '1', from: to.fullPath },
     }),
-    meta: { requiresAuth: true },
   },
 ]
 
@@ -74,12 +91,12 @@ const router = createRouter({
   routes,
 })
 
-// Global navigation guard enforcing authentication and authorization
+// Guard global de autenticación y autorización
 router.beforeEach((to) => {
-  const auth = useAuthStore()
+  const auth      = useAuthStore()
   const userStore = useUserStore()
 
-  // Redirect unauthenticated users to the login page
+  // Redirige al login si la ruta requiere auth y no hay token
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return {
       name: 'login',
@@ -87,19 +104,11 @@ router.beforeEach((to) => {
     }
   }
 
-  // Deny access to admin-only routes
+  // Redirige al home si la ruta requiere admin y el usuario no lo es
   if (to.meta.requiresAdmin && !userStore.isAdmin) {
     return {
       name: 'home',
       query: { denied: 'admin' },
-    }
-  }
-
-  // Deny access to the users list for non-admins (adjust when roles are available)
-  if (to.meta.requiresList && !userStore.isAdmin) {
-    return {
-      name: 'home',
-      query: { denied: 'list' },
     }
   }
 

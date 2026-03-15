@@ -43,7 +43,15 @@ async function loadDevices() {
 }
 
 function addDevices() {
-  router.push({ name: 'admin-devices', query: { product: productId } })
+  // Fase 4 — ruta aún no implementada
+  // router.push({ name: 'admin-devices', query: { product: productId } })
+  toast.add({
+    severity: 'info',
+    summary: 'Próximamente',
+    detail: 'La gestión de dispositivos estará disponible en la siguiente fase.',
+    life: 3000,
+  })
+  //router.push({ name: 'admin-devices', query: { product: productId } })
 }
 
 onMounted(() => {

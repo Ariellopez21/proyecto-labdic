@@ -100,7 +100,12 @@ class Product(Base):
     is_active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
 
-    devices: Mapped[list["Device"]] = relationship("Device", back_populates="product")
+    devices: Mapped[list["Device"]] = relationship(
+        "Device",
+        back_populates="product",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
     brand: Mapped["Brand"] = relationship("Brand", back_populates="products")
     model: Mapped["Model"] = relationship("Model", back_populates="products")
     category: Mapped["Category"] = relationship("Category", back_populates="products")
@@ -138,7 +143,9 @@ class Device(Base):
     __tablename__ = "devices"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("products.id", ondelete="CASCADE")
+    )
     # Ejemplo: "7467122111293"
     internal_code: Mapped[str] = mapped_column(String(50), nullable=True, unique=True)
     # Ejemplo: "SN123456789"
@@ -151,7 +158,12 @@ class Device(Base):
     product: Mapped["Product"] = relationship("Product", back_populates="devices")
     status: Mapped["Status"] = relationship("Status", back_populates="devices")
     ubication: Mapped["Ubication"] = relationship("Ubication", back_populates="devices")
-    loan_request_items: Mapped[list["LoanRequestItem"]] = relationship("LoanRequestItem", back_populates="device")  # noqa: E501
+    loan_request_items: Mapped[list["LoanRequestItem"]] = relationship(
+    "LoanRequestItem",
+    back_populates="device",
+    cascade="all, delete-orphan",
+    passive_deletes=True,
+    )
     status_logs: Mapped[list["DeviceStatusLog"]] = relationship("DeviceStatusLog", back_populates="device")
 class LoanRequest(Base):
     """Para gestionar las solicitudes de préstamo de dispositivos."""
@@ -183,6 +195,9 @@ class LoanRequestItem(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     loan_request_id: Mapped[int] = mapped_column(ForeignKey("loan_requests.id"))
+    device_id: Mapped[int] = mapped_column(
+        ForeignKey("devices.id", ondelete="CASCADE")
+    )
     device_id: Mapped[int] = mapped_column(ForeignKey("devices.id"))
 
     loan_request: Mapped["LoanRequest"] = relationship("LoanRequest", back_populates="loan_request_items")

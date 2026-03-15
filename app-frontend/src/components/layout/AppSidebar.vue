@@ -10,17 +10,17 @@ const userStore = useUserStore()
 const appStore  = useAppStore()
 
 const baseItems = [
-  { label: 'Inicio', icon: 'pi pi-home', name: 'home' },
-  // { label: 'Catálogo',      icon: 'pi pi-box',      name: 'catalog' },    // Fase 4
-  // { label: 'Mis Préstamos', icon: 'pi pi-list',     name: 'my-loans' },   // Fase 5
+  { label: 'Inicio',          icon: 'pi pi-home',       name: 'home' },
+  { label: 'Catálogo',        icon: 'pi pi-box',         name: 'catalog' },
+  // { label: 'Mis Préstamos', icon: 'pi pi-list',       name: 'my-loans' },  // Fase 5
 ]
 
 const adminItems = [
-  { label: 'Usuarios',     icon: 'pi pi-users',     name: 'admin-users' },
-  { label: 'Productos',    icon: 'pi pi-tag',        name: 'admin-products' },
-  { label: 'Catálogo',     icon: 'pi pi-cog',        name: 'admin-catalog' },
-  // { label: 'Dispositivos', icon: 'pi pi-server',   name: 'admin-devices' },  // Fase 4
-  // { label: 'Préstamos',    icon: 'pi pi-file-edit', name: 'admin-loans' },   // Fase 5
+  { label: 'Usuarios',        icon: 'pi pi-users',       name: 'admin-users' },
+  { label: 'Productos',       icon: 'pi pi-tag',          name: 'admin-products' },
+  { label: 'Dispositivos',    icon: 'pi pi-server',       name: 'admin-devices' },
+  { label: 'Catálogo',        icon: 'pi pi-cog',          name: 'admin-catalog' },
+  // { label: 'Préstamos',    icon: 'pi pi-file-edit',    name: 'admin-loans' },  // Fase 5
 ]
 
 const navItems = computed(() => {
@@ -34,7 +34,6 @@ function navigate(name: string) {
   if (window.innerWidth < 768) appStore.sidebarOpen = false
 }
 
-// Activo también en la vista de detalle del producto
 function isActive(name: string) {
   if (name === 'admin-products') {
     return route.name === 'admin-products' || route.name === 'admin-product-detail'

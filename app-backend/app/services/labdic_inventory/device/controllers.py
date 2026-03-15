@@ -1,12 +1,13 @@
 # app/services/labdic_inventory/device/controllers.py
 
-from typing import Any, Sequence
+from typing import Any, Optional, Sequence
 
 from advanced_alchemy.exceptions import NotFoundError
 from litestar import Controller, Request, Response, delete, get, patch, post
 from litestar.contrib.jwt import Token
 from litestar.di import Provide
 from litestar.dto import DTOData
+from litestar.params import Parameter
 
 from app.models.inventory import Device, DeviceStatusLog, User
 
@@ -37,9 +38,15 @@ class DeviceController(Controller):
     exception_handlers = {NotFoundError: not_found_error_handler}
 
     @get(path="/", summary="ListDevices")
-    async def list(self, devices_repo: DeviceRepository) -> Sequence[Device]:
-        """Lista todos los dispositivos."""
-        return devices_repo.list()
+    async def list(
+        self,
+        devices_repo: DeviceRepository,
+        product_id: Optional[int] = Parameter(query="product_id", default=None, required=False),
+    ) -> Sequence[Device]:
+        """Lista todos los dispositivos. Acepta ?product_id= para filtrar por producto."""
+        if product_id is not None:
+            return devices_repo.list_by_product(product_id)
+        return devices_repo.list_all_with_relations()
 
     @get(path="/available", summary="ListAvailableDevices")
     async def list_available(self, devices_repo: DeviceRepository) -> Sequence[Device]:
@@ -69,11 +76,7 @@ class DeviceController(Controller):
         )
         return device
 
-    @patch(
-        path="/{device_id:int}/status",
-        summary="ChangeDeviceStatus",
-        tags=["devices"],
-    )
+    @patch(path="/{device_id:int}/status", summary="ChangeDeviceStatus")
     async def change_status(
         self,
         device_id: int,

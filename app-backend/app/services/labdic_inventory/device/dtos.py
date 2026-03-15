@@ -17,14 +17,15 @@ class DeviceReadDTO(SQLAlchemyDTO[Device]):
 
 class DeviceCreateDTO(SQLAlchemyDTO[Device]):
     config = SQLAlchemyDTOConfig(
-        exclude={"id", "created_at", "loan_request_items", "status_logs"},
+        exclude={"id", "created_at", "loan_request_items", "status_logs",
+                 "product", "status", "ubication"},
         partial=False,
     )
 
 class DeviceUpdateDTO(SQLAlchemyDTO[Device]):
     config = SQLAlchemyDTOConfig(
-        # status_id se excluye: para eso existe el endpoint dedicado /status
-        exclude={"id", "created_at", "status_id", "loan_request_items", "status_logs"},
+        exclude={"id", "created_at", "status_id", "loan_request_items", "status_logs",
+                 "product", "status", "ubication"},
         partial=True,
     )
 

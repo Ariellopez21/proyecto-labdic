@@ -152,7 +152,7 @@ class Device(Base):
     serial_number: Mapped[str] = mapped_column(String(50), nullable=True, unique=True)
     status_id: Mapped[int] = mapped_column(ForeignKey("statuses.id"))
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
-    ubication_id: Mapped[int] = mapped_column(ForeignKey("ubications.id"), nullable=True)
+    ubication_id: Mapped[int | None] = mapped_column(ForeignKey("ubications.id"), nullable=True)
 
     # Relación con Product, Status y Ubication
     product: Mapped["Product"] = relationship("Product", back_populates="devices")

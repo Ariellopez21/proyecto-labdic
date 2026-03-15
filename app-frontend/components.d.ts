@@ -25,6 +25,8 @@ declare module 'vue' {
     ConfirmDialog: typeof import('primevue/confirmdialog')['default']
     copy: typeof import('./src/components/dialogs/UserDetailsDialog copy.vue')['default']
     DataTable: typeof import('primevue/datatable')['default']
+    DatePicker: typeof import('primevue/datepicker')['default']
+    DevicesStatusBadge: typeof import('./src/components/ui/DevicesStatusBadge.vue')['default']
     Dialog: typeof import('primevue/dialog')['default']
     Divider: typeof import('primevue/divider')['default']
     Drawer: typeof import('primevue/drawer')['default']

@@ -34,6 +34,7 @@ declare module 'vue' {
     FloatLabel: typeof import('primevue/floatlabel')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Label: typeof import('primevue/label')['default']
+    LoanStatusBadge: typeof import('./src/components/ui/LoanStatusBadge.vue')['default']
     Menu: typeof import('primevue/menu')['default']
     Message: typeof import('primevue/message')['default']
     MultiSelect: typeof import('primevue/multiselect')['default']

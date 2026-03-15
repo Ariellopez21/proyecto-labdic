@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import type { Device } from '@/types/device.types'
 import type { Category } from '@/types/catalog.types'
 import { getAvailableDevices } from '@/services/device.service'
 import { getCategories } from '@/services/catalog.service'
+import { createLoan } from '@/services/loan.service'
 import DeviceStatusBadge from '@/components/ui/DevicesStatusBadge.vue'
 
-const toast = useToast()
+const router = useRouter()
+const toast  = useToast()
 
 // ── Datos ─────────────────────────────────────────────────────────────
-
 const loading    = ref(false)
 const devices    = ref<Device[]>([])
 const categories = ref<Category[]>([])
@@ -34,11 +36,9 @@ const filterSearch   = ref('')
 
 const filteredDevices = computed(() => {
   let result = devices.value
-
   if (filterCategory.value) {
-  result = result.filter(d => d.product?.categoryId === filterCategory.value)
+    result = result.filter(d => d.product?.categoryId === filterCategory.value)
   }
-
   if (filterSearch.value.trim()) {
     const q = filterSearch.value.toLowerCase()
     result = result.filter(d =>
@@ -47,7 +47,6 @@ const filteredDevices = computed(() => {
       d.serialNumber?.toLowerCase().includes(q)
     )
   }
-
   return result
 })
 
@@ -56,16 +55,13 @@ function clearFilters() {
   filterSearch.value   = ''
 }
 
-// ── Selección de devices para préstamo ───────────────────────────────
+// ── Selección ─────────────────────────────────────────────────────────
 const selectedDeviceIds = ref<number[]>([])
 
 function toggleSelection(deviceId: number) {
   const idx = selectedDeviceIds.value.indexOf(deviceId)
-  if (idx === -1) {
-    selectedDeviceIds.value.push(deviceId)
-  } else {
-    selectedDeviceIds.value.splice(idx, 1)
-  }
+  if (idx === -1) selectedDeviceIds.value.push(deviceId)
+  else selectedDeviceIds.value.splice(idx, 1)
 }
 
 function isSelected(deviceId: number) {
@@ -77,10 +73,10 @@ const selectedDevices = computed(() =>
 )
 
 // ── Dialog solicitud de préstamo ─────────────────────────────────────
-const showLoanDialog        = ref(false)
-const loanReason            = ref('')
-const loanEstimatedReturn   = ref<Date | null>(null)
-const submittingLoan        = ref(false)
+const showLoanDialog      = ref(false)
+const loanReason          = ref('')
+const loanEstimatedReturn = ref<Date | null>(null)
+const submittingLoan      = ref(false)
 
 function openLoanDialog() {
   if (selectedDeviceIds.value.length === 0) {
@@ -93,30 +89,41 @@ function openLoanDialog() {
 }
 
 async function handleCreateLoan() {
-  // Fase 5 — aquí se llamará a loan.service.ts
-  // Por ahora mostramos confirmación visual
   submittingLoan.value = true
   try {
-    // TODO Fase 5:
-    // await createLoanRequest({
-    //   deviceIds: selectedDeviceIds.value,
-    //   reason: loanReason.value,
-    //   estimatedReturnDate: loanEstimatedReturn.value,
-    // })
-    toast.add({
-      severity: 'info',
-      summary: 'Próximamente',
-      detail: 'La creación de solicitudes de préstamo estará disponible en la próxima actualización.',
-      life: 4000,
+    await createLoan({
+      deviceIds: selectedDeviceIds.value,
+      reason: loanReason.value || undefined,
+      estimatedReturnDate: loanEstimatedReturn.value
+        ? loanEstimatedReturn.value.toISOString()
+        : undefined,
     })
+
+    toast.add({
+      severity: 'success',
+      summary: 'Solicitud enviada',
+      detail: 'Tu solicitud fue enviada correctamente. Puedes revisarla en "Mis Solicitudes".',
+      life: 5000,
+    })
+
     showLoanDialog.value    = false
     selectedDeviceIds.value = []
+
+    // Recargar catálogo para reflejar cambios de disponibilidad
+    await loadData()
+
+  } catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No se pudo enviar la solicitud. Intenta nuevamente.',
+      life: 4000,
+    })
   } finally {
     submittingLoan.value = false
   }
 }
 
-// ── Init ──────────────────────────────────────────────────────────────
 onMounted(loadData)
 </script>
 
@@ -129,8 +136,6 @@ onMounted(loadData)
         <h1 class="page-title">Catálogo de Dispositivos</h1>
         <p class="page-subtitle">Selecciona los dispositivos que deseas solicitar en préstamo</p>
       </div>
-
-      <!-- Botón solicitar (visible cuando hay selección) -->
       <Transition name="fade">
         <Button
           v-if="selectedDeviceIds.length > 0"
@@ -149,9 +154,7 @@ onMounted(loadData)
             v-model="filterSearch"
             placeholder="Buscar por nombre, código o serie..."
             class="filter-search"
-          >
-          </InputText>
-
+          />
           <Select
             v-model="filterCategory"
             :options="categories"
@@ -161,10 +164,9 @@ onMounted(loadData)
             showClear
             class="filter-category"
           />
-
           <Button
             v-if="filterCategory || filterSearch"
-            label="Limpiar filtros"
+            label="Limpiar"
             severity="secondary"
             text
             icon="pi pi-times"
@@ -174,7 +176,7 @@ onMounted(loadData)
       </template>
     </Card>
 
-    <!-- Contador de resultados -->
+    <!-- Contador -->
     <div class="results-info">
       <span>{{ filteredDevices.length }} dispositivo{{ filteredDevices.length !== 1 ? 's' : '' }} disponible{{ filteredDevices.length !== 1 ? 's' : '' }}</span>
       <span v-if="selectedDeviceIds.length > 0" class="selected-count">
@@ -182,15 +184,10 @@ onMounted(loadData)
       </span>
     </div>
 
-    <!-- Tabla de dispositivos -->
+    <!-- Tabla -->
     <Card>
       <template #content>
-        <DataTable
-          :value="filteredDevices"
-          :loading="loading"
-          dataKey="id"
-          stripedRows
-        >
+        <DataTable :value="filteredDevices" :loading="loading" dataKey="id" stripedRows>
           <template #empty>
             <div class="text-center py-8 text-muted-color">
               <i class="pi pi-inbox text-4xl block mb-3 opacity-30" />
@@ -198,14 +195,9 @@ onMounted(loadData)
             </div>
           </template>
 
-          <!-- Columna de selección -->
           <Column style="width: 52px">
             <template #body="{ data }">
-              <Checkbox
-                :modelValue="isSelected(data.id)"
-                :binary="true"
-                @change="toggleSelection(data.id)"
-              />
+              <Checkbox :modelValue="isSelected(data.id)" :binary="true" @change="toggleSelection(data.id)" />
             </template>
           </Column>
 
@@ -213,9 +205,7 @@ onMounted(loadData)
             <template #body="{ data }">
               <div class="product-info">
                 <span class="product-name">{{ data.product?.name ?? '—' }}</span>
-                <span v-if="data.product?.category" class="product-category">
-                  {{ data.product.category.name }}
-                </span>
+                <span v-if="data.product?.category" class="product-category">{{ data.product.category.name }}</span>
               </div>
             </template>
           </Column>
@@ -234,8 +224,7 @@ onMounted(loadData)
             <template #body="{ data }">{{ data.ubication?.name ?? '—' }}</template>
           </Column>
 
-          <!-- Columna de selección rápida -->
-          <Column style="width: 120px">
+          <Column style="width: 130px">
             <template #body="{ data }">
               <Button
                 :label="isSelected(data.id) ? 'Quitar' : 'Seleccionar'"
@@ -246,12 +235,11 @@ onMounted(loadData)
               />
             </template>
           </Column>
-
         </DataTable>
       </template>
     </Card>
 
-    <!-- Dialog de solicitud de préstamo -->
+    <!-- Dialog solicitud -->
     <Dialog
       v-model:visible="showLoanDialog"
       header="Solicitar préstamo"
@@ -261,15 +249,10 @@ onMounted(loadData)
     >
       <div class="loan-dialog-content">
 
-        <!-- Dispositivos seleccionados -->
         <div class="selected-devices-section">
           <label class="section-label">Dispositivos seleccionados</label>
           <div class="selected-devices-list">
-            <div
-              v-for="device in selectedDevices"
-              :key="device.id"
-              class="selected-device-item"
-            >
+            <div v-for="device in selectedDevices" :key="device.id" class="selected-device-item">
               <i class="pi pi-server text-muted-color" />
               <span>{{ device.product?.name ?? '—' }}</span>
               <span class="device-code text-muted-color">{{ device.internalCode ?? `#${device.id}` }}</span>
@@ -277,7 +260,6 @@ onMounted(loadData)
           </div>
         </div>
 
-        <!-- Motivo -->
         <div class="flex flex-col gap-1">
           <label class="font-medium">Motivo del préstamo</label>
           <Textarea
@@ -288,7 +270,6 @@ onMounted(loadData)
           />
         </div>
 
-        <!-- Fecha estimada de devolución -->
         <div class="flex flex-col gap-1">
           <label class="font-medium">Fecha estimada de devolución</label>
           <DatePicker
@@ -305,12 +286,7 @@ onMounted(loadData)
 
       <template #footer>
         <Button label="Cancelar" severity="secondary" text :disabled="submittingLoan" @click="showLoanDialog = false" />
-        <Button
-          label="Enviar solicitud"
-          icon="pi pi-send"
-          :loading="submittingLoan"
-          @click="handleCreateLoan"
-        />
+        <Button label="Enviar solicitud" icon="pi pi-send" :loading="submittingLoan" @click="handleCreateLoan" />
       </template>
     </Dialog>
 
@@ -322,31 +298,19 @@ onMounted(loadData)
 .page-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; }
 .page-title { font-size: 1.5rem; font-weight: 700; margin: 0; }
 .page-subtitle { font-size: 0.875rem; color: var(--p-text-muted-color); margin: 0.25rem 0 0; }
-
 .filters-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
 .filter-search { flex: 1; min-width: 200px; }
 .filter-category { width: 200px; }
-
 .results-info { font-size: 0.875rem; color: var(--p-text-muted-color); }
 .selected-count { color: var(--p-primary-color); font-weight: 600; }
-
 .product-info { display: flex; flex-direction: column; gap: 0.15rem; }
 .product-name { font-weight: 500; font-size: 0.9rem; }
 .product-category { font-size: 0.75rem; color: var(--p-text-muted-color); }
-
-/* Dialog */
 .loan-dialog-content { display: flex; flex-direction: column; gap: 1rem; }
 .section-label { font-weight: 600; font-size: 0.875rem; display: block; margin-bottom: 0.5rem; }
 .selected-devices-list { display: flex; flex-direction: column; gap: 0.4rem; max-height: 150px; overflow-y: auto; }
-.selected-device-item {
-  display: flex; align-items: center; gap: 0.5rem;
-  padding: 0.4rem 0.6rem; border-radius: 6px;
-  background: var(--p-surface-50, rgba(0,0,0,0.03));
-  font-size: 0.875rem;
-}
+.selected-device-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem; border-radius: 6px; background: var(--p-surface-50, rgba(0,0,0,0.03)); font-size: 0.875rem; }
 .device-code { margin-left: auto; font-size: 0.8rem; }
-
-/* Transición del botón de solicitud */
 .fade-enter-active, .fade-leave-active { transition: opacity 200ms, transform 200ms; }
 .fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-4px); }
 </style>

@@ -44,12 +44,27 @@ class ProductController(Controller):
         self, product_id: int, data: DTOData[Product], products_repo: ProductRepository
     ) -> Product:
         """Update an existing product."""
-        product, _ = products_repo.get_and_update(
-            id=product_id,
-            **data.as_builtins(),
-            match_fields=["id"],
-            auto_commit=True,
-        )
+        # as_builtins() excluye None en partial=True.
+        # Usamos el modelo directamente para que los null se apliquen explícitamente.
+        update_data = data.as_builtins()
+
+        # Forzamos brand_id, model_id, category_id a None si vienen como None
+        # para que SQLAlchemy los limpie en lugar de ignorarlos
+        product = products_repo.get_one(id=product_id)
+
+        for field in ["brand_id", "model_id", "category_id"]:
+            if field in update_data:
+                setattr(product, field, update_data[field])
+
+        # Actualizamos el resto de campos normalmente
+        for field, value in update_data.items():
+            if field not in ["brand_id", "model_id", "category_id"]:
+                setattr(product, field, value)
+
+        products_repo.session.flush()
+        products_repo.session.commit()
+        products_repo.session.refresh(product)
+
         return product
 
     @delete(path="/{product_id:int}", summary="DeleteProduct")

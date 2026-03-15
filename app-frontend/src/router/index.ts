@@ -5,84 +5,70 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import AppLayout  from '@/components/layout/AppLayout.vue'
 import AuthLayout from '@/components/layout/AuthLayout.vue'
 
-// Vistas — Auth
+// Auth
 import LoginView from '@/modules/auth/views/LoginView.vue'
 
-// Vistas — App (todos los usuarios)
+// App — todos los usuarios
 import HomeView   from '@/modules/HomeView.vue'
 import MyUserView from '@/modules/users/views/MyUserView.vue'
 
-// Vistas — Admin
+// Admin — Usuarios
 import UsersListView  from '@/modules/users/views/UsersListView.vue'
 import AdminRolesView from '@/modules/users/views/AdminRolesView.vue'
+
+// Admin — Catálogo
+import CatalogView from '@/modules/catalog/views/CatalogView.vue'
+
+// Admin — Productos
+import ProductsListView  from '@/modules/products/views/ProductsListView.vue'
+import ProductDetailView from '@/modules/products/views/ProductDetailsView.vue'
 
 import { useAuthStore } from '@/stores/auth.store'
 import { useUserStore } from '@/stores/user.store'
 
 const routes: RouteRecordRaw[] = [
 
-  // ── Rutas públicas (sin sidebar) ──────────────────────────────────
+  // ── Rutas públicas ────────────────────────────────────────────────
   {
     path: '/login',
     component: AuthLayout,
     children: [
-      {
-        path: '',
-        name: 'login',
-        component: LoginView,
-      },
+      { path: '', name: 'login', component: LoginView },
     ],
   },
 
-  // ── Rutas privadas (con AppLayout: sidebar + topbar) ──────────────
+  // ── Rutas privadas ────────────────────────────────────────────────
   {
     path: '/',
     component: AppLayout,
     meta: { requiresAuth: true },
     children: [
-      {
-        path: '',
-        name: 'home',
-        component: HomeView,
-      },
-      {
-        path: 'me',
-        name: 'my-profile',
-        component: MyUserView,
-      },
+      { path: '',   name: 'home',       component: HomeView },
+      { path: 'me', name: 'my-profile', component: MyUserView },
 
-      // Admin — Usuarios
-      {
-        path: 'admin/users',
-        name: 'admin-users',
-        component: UsersListView,
-        meta: { requiresAdmin: true },
-      },
-      {
-        path: 'admin/roles',
-        name: 'admin-roles',
-        component: AdminRolesView,
-        meta: { requiresAdmin: true },
-      },
+      // Usuarios
+      { path: 'admin/users',  name: 'admin-users',  component: UsersListView,  meta: { requiresAdmin: true } },
+      { path: 'admin/roles',  name: 'admin-roles',  component: AdminRolesView, meta: { requiresAdmin: true } },
 
-      // Fases futuras — se agregan aquí:
-      // { path: 'catalog',           name: 'catalog',          component: ... }
-      // { path: 'my-loans',          name: 'my-loans',         component: ... }
-      // { path: 'admin/products',    name: 'admin-products',   component: ... }
-      // { path: 'admin/devices',     name: 'admin-devices',    component: ... }
-      // { path: 'admin/loans',       name: 'admin-loans',      component: ... }
-      // { path: 'admin/catalog',     name: 'admin-catalog',    component: ... }
+      // Catálogo
+      { path: 'admin/catalog', name: 'admin-catalog', component: CatalogView, meta: { requiresAdmin: true } },
+
+      // Productos
+      { path: 'admin/products',     name: 'admin-products',       component: ProductsListView,  meta: { requiresAdmin: true } },
+      { path: 'admin/products/:id', name: 'admin-product-detail', component: ProductDetailView, meta: { requiresAdmin: true } },
+
+      // Fases futuras:
+      // { path: 'catalog',           name: 'catalog',        component: ... }  // Fase 4 — vista pública
+      // { path: 'my-loans',          name: 'my-loans',       component: ... }  // Fase 5
+      // { path: 'admin/devices',     name: 'admin-devices',  component: ... }  // Fase 4
+      // { path: 'admin/loans',       name: 'admin-loans',    component: ... }  // Fase 5
     ],
   },
 
   // ── Catch-all ─────────────────────────────────────────────────────
   {
     path: '/:pathMatch(.*)*',
-    name: 'not-found',
-    redirect: (to) => ({
-      name: 'home',
-      query: { nf: '1', from: to.fullPath },
-    }),
+    redirect: (to) => ({ name: 'home', query: { nf: '1', from: to.fullPath } }),
   },
 ]
 
@@ -91,26 +77,15 @@ const router = createRouter({
   routes,
 })
 
-// Guard global de autenticación y autorización
 router.beforeEach((to) => {
   const auth      = useAuthStore()
   const userStore = useUserStore()
 
-  // Redirige al login si la ruta requiere auth y no hay token
-  if (to.meta.requiresAuth && !auth.isAuthenticated) {
-    return {
-      name: 'login',
-      query: { redirect: to.fullPath },
-    }
-  }
+  if (to.meta.requiresAuth && !auth.isAuthenticated)
+    return { name: 'login', query: { redirect: to.fullPath } }
 
-  // Redirige al home si la ruta requiere admin y el usuario no lo es
-  if (to.meta.requiresAdmin && !userStore.isAdmin) {
-    return {
-      name: 'home',
-      query: { denied: 'admin' },
-    }
-  }
+  if (to.meta.requiresAdmin && !userStore.isAdmin)
+    return { name: 'home', query: { denied: 'admin' } }
 
   return true
 })

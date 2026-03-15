@@ -1,4 +1,4 @@
-// src/api/roles.ts
+// src/services/role.service.ts
 import type { Role } from '@/types/role.types'
 import { apiFetch } from './api'
 

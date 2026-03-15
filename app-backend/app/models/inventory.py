@@ -93,9 +93,9 @@ class Product(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     # Ejemplo: "Laptop Dell XPS 13"
     name: Mapped[str] = mapped_column(String(100), unique=True)
-    brand_id: Mapped[int] = mapped_column(ForeignKey("brands.id"), nullable=True)
-    model_id: Mapped[int] = mapped_column(ForeignKey("models.id"), nullable=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=True)
+    brand_id: Mapped[int | None] = mapped_column(ForeignKey("brands.id"), nullable=True)
+    model_id: Mapped[int | None] = mapped_column(ForeignKey("models.id"), nullable=True)
+    category_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id"), nullable=True)
     description: Mapped[str] = mapped_column(String(500), nullable=True)
     is_active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))

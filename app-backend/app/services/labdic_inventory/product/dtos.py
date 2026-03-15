@@ -14,12 +14,12 @@ class ProductReadDTO(SQLAlchemyDTO[Product]):
 
 class ProductCreateDTO(SQLAlchemyDTO[Product]):
     config = SQLAlchemyDTOConfig(
-        exclude={"id", "created_at", "devices"},
+        exclude={"id", "created_at", "devices", "brand", "model", "category"},
         partial=False,
     )
 
 class ProductUpdateDTO(SQLAlchemyDTO[Product]):
     config = SQLAlchemyDTOConfig(
-        exclude={"id", "created_at", "devices"},
+        exclude={"id", "created_at", "devices", "brand", "model", "category"},
         partial=True,
     )

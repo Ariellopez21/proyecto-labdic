@@ -13,14 +13,14 @@ interface RequestInitWithJson extends RequestInit {
 
 
 /**
- * Generic API fetch function that automatically sets the Authorization header
- * using the current token from the auth store. It also handles JSON parsing
- * and basic error handling.
+ * Función genérica para hacer peticiones a la API que configura automáticamente
+ * el encabezado Authorization usando el token actual del store de auth.
+ * También maneja el parseo JSON y el tratamiento básico de errores.
  *
- * @template T The expected return type of the response
- * @param url The relative URL for the API endpoint
- * @param options Additional fetch options such as method, headers or body
- * @returns The parsed JSON response
+ * @template T El tipo esperado de la respuesta
+ * @param url La URL relativa del endpoint de la API
+ * @param options Opciones adicionales para fetch como method, headers o body
+ * @returns La respuesta parseada en JSON
  */
 export async function apiFetch<T>(
   endpoint: string,

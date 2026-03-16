@@ -152,8 +152,8 @@ onMounted(loadRoles)
     </div>
 
     <!-- Roles (opcionales — el backend asigna "usuario" si no se selecciona ninguno) -->
-    <div>
-      <label class="block text-sm font-medium mb-1">Roles</label>
+    <div class="flex flex-col gap-1">
+      <label class="font-medium">Roles</label>
       <MultiSelect
         v-model="form.roleIds"
         :options="allRoles"
@@ -164,9 +164,9 @@ onMounted(loadRoles)
         class="w-full"
         :loading="loadingRoles"
       />
-      <p class="mt-1 text-xs opacity-60">
+      <small class="text-muted-color">
         Si no seleccionas ninguno, se asignará el rol "usuario" por defecto.
-      </p>
+      </small>
     </div>
 
     <!-- Botones -->
@@ -179,5 +179,4 @@ onMounted(loadRoles)
 </template>
 
 <style scoped>
-.user-form label { color: rgba(255,255,255,0.85) }
 </style>

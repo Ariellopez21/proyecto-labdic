@@ -12,7 +12,7 @@ const appStore  = useAppStore()
 const baseItems = [
   { label: 'Inicio',         icon: 'pi pi-home',      name: 'home' },
   { label: 'Catálogo',       icon: 'pi pi-box',        name: 'catalog' },
-  { label: 'Mis Préstamos',  icon: 'pi pi-list',       name: 'my-loans' },
+  { label: 'Mis Solicitudes',  icon: 'pi pi-list',       name: 'my-loans' },
 ]
 
 const adminItems = [
@@ -20,7 +20,7 @@ const adminItems = [
   { label: 'Productos',      icon: 'pi pi-tag',         name: 'admin-products' },
   { label: 'Dispositivos',   icon: 'pi pi-server',      name: 'admin-devices' },
   { label: 'Préstamos',      icon: 'pi pi-file-edit',   name: 'admin-loans' },
-  { label: 'Catálogo',       icon: 'pi pi-cog',         name: 'admin-catalog' },
+  { label: 'Auxiliares',       icon: 'pi pi-cog',         name: 'admin-catalog' },
 ]
 
 const navItems = computed(() => {

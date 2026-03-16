@@ -6,7 +6,7 @@ import type { Device } from '@/types/device.types'
 import type { Category } from '@/types/catalog.types'
 import { getAvailableDevices } from '@/services/device.service'
 import { getCategories } from '@/services/catalog.service'
-import { createLoan } from '@/services/loan.service'
+import { createLoan, getMyLoans } from '@/services/loan.service'
 import DeviceStatusBadge from '@/components/ui/DevicesStatusBadge.vue'
 
 const router = useRouter()
@@ -78,11 +78,38 @@ const loanReason          = ref('')
 const loanEstimatedReturn = ref<Date | null>(null)
 const submittingLoan      = ref(false)
 
-function openLoanDialog() {
+async function openLoanDialog() {
   if (selectedDeviceIds.value.length === 0) {
     toast.add({ severity: 'warn', summary: 'Sin selección', detail: 'Selecciona al menos un dispositivo.', life: 3000 })
     return
   }
+
+  // Verificar solicitudes activas del usuario para evitar duplicados
+  try {
+    const myLoans = await getMyLoans()
+    const activeDeviceIds = myLoans
+      .filter(l => ['pendiente', 'aprobado'].includes(l.status?.name ?? ''))
+      .flatMap(l => l.loanRequestItems?.map(item => item.deviceId) ?? [])
+
+    const duplicates = selectedDeviceIds.value.filter(id => activeDeviceIds.includes(id))
+
+    if (duplicates.length > 0) {
+      const names = selectedDevices.value
+        .filter(d => duplicates.includes(d.id))
+        .map(d => d.product?.name ?? `#${d.id}`)
+        .join(', ')
+      toast.add({
+        severity: 'warn',
+        summary: 'Solicitud duplicada',
+        detail: `Ya tienes una solicitud activa para: ${names}.`,
+        life: 5000,
+      })
+      return
+    }
+  } catch {
+    // Si falla la verificación, dejamos continuar igual
+  }
+
   loanReason.value          = ''
   loanEstimatedReturn.value = null
   showLoanDialog.value      = true
@@ -201,7 +228,7 @@ onMounted(loadData)
             </template>
           </Column>
 
-          <Column header="Producto">
+          <Column header="Dispositivo">
             <template #body="{ data }">
               <div class="product-info">
                 <span class="product-name">{{ data.product?.name ?? '—' }}</span>

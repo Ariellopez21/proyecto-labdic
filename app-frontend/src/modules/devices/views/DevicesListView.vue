@@ -211,6 +211,12 @@ onMounted(() => {
           />
         </p>
         <p v-else class="page-subtitle">Gestiona los dispositivos del inventario</p>
+<div class="states-info">
+  <span class="states-label">Estados posibles:</span>
+  <DeviceStatusBadge status="disponible" />
+  <DeviceStatusBadge status="prestado" />
+  <DeviceStatusBadge status="en_mantenimiento" />
+</div>
       </div>
       <Button icon="pi pi-plus" label="Nuevo Dispositivo" @click="openCreateDrawer" />
     </div>
@@ -359,4 +365,15 @@ onMounted(() => {
 .page-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; }
 .page-title { font-size: 1.5rem; font-weight: 700; margin: 0; }
 .page-subtitle { font-size: 0.875rem; color: var(--p-text-muted-color); margin: 0.25rem 0 0; display: flex; align-items: center; gap: 0.25rem; }
+.states-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  flex-wrap: wrap;
+}
+.states-label {
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
+}
 </style>

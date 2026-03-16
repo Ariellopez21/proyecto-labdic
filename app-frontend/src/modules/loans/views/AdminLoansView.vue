@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, type Ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
+import { getDevice } from '@/services/device.service'
 import type { LoanRequest } from '@/types/loan.types'
 import { getLoans, getLoan, approveLoan, rejectLoan, deliverLoan, returnLoan, deleteLoan } from '@/services/loan.service'
 import LoanStatusBadge from '@/components/ui/LoanStatusBadge.vue'
@@ -22,9 +23,9 @@ async function loadLoans() {
   }
 }
 
-// ── Drawer de detalle + timeline ──────────────────────────────────────
-const showDrawer     = ref(false)
-const drawerLoading  = ref(false)
+// ── Drawer de detalle ─────────────────────────────────────────────────
+const showDrawer    = ref(false)
+const drawerLoading = ref(false)
 const selectedLoan: Ref<LoanRequest | null> = ref(null)
 
 async function openDetail(loan: LoanRequest) {
@@ -32,6 +33,17 @@ async function openDetail(loan: LoanRequest) {
   drawerLoading.value = true
   try {
     selectedLoan.value = await getLoan(loan.id)
+
+    // Enriquecer los items con los datos del device
+    if (selectedLoan.value.loanRequestItems?.length) {
+      const devices = await Promise.all(
+        selectedLoan.value.loanRequestItems.map(item => getDevice(item.deviceId))
+      )
+      selectedLoan.value.loanRequestItems = selectedLoan.value.loanRequestItems.map(
+        (item, idx) => ({ ...item, device: devices[idx] })
+      )
+    }
+
   } catch {
     toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar el detalle.', life: 4000 })
     showDrawer.value = false
@@ -40,15 +52,27 @@ async function openDetail(loan: LoanRequest) {
   }
 }
 
+// ── Timeline ──────────────────────────────────────────────────────────
 function getTimeline(loan: LoanRequest) {
+  const isRejected = loan.status.name === 'rechazado'
   return [
-    { label: 'Solicitud enviada',      date: loan.requestDate,         done: true,                                                 icon: 'pi pi-file-edit' },
-    { label: loan.status.name === 'rejected' ? 'Rechazada' : 'Aprobada',
-                                        date: null,                     done: ['approved','delivered','returned','rejected'].includes(loan.status.name),
-      icon: loan.status.name === 'rejected' ? 'pi pi-times-circle' : 'pi pi-check-circle',
-      isReject: loan.status.name === 'rejected' },
-    { label: 'Dispositivos entregados', date: loan.deliveryDate ?? null, done: ['delivered','returned'].includes(loan.status.name), icon: 'pi pi-send' },
-    { label: 'Dispositivos devueltos',  date: loan.actualReturnDate ?? null, done: loan.status.name === 'returned',                icon: 'pi pi-undo' },
+    { label: 'Solicitud enviada',
+      date:  loan.requestDate,
+      done:  true,
+      icon:  'pi pi-file-edit' },
+    { label: isRejected ? 'Solicitud rechazada' : 'Solicitud aprobada',
+      date:  null,
+      done:  ['aprobado', 'prestado', 'devuelto', 'rechazado'].includes(loan.status.name),
+      icon:  isRejected ? 'pi pi-times-circle' : 'pi pi-check-circle',
+      isReject: isRejected },
+    { label: 'Dispositivos entregados',
+      date:  loan.deliveryDate ?? null,
+      done:  ['prestado', 'devuelto'].includes(loan.status.name),
+      icon:  'pi pi-send' },
+    { label: 'Dispositivos devueltos',
+      date:  loan.actualReturnDate ?? null,
+      done:  loan.status.name === 'devuelto',
+      icon:  'pi pi-undo' },
   ]
 }
 
@@ -71,10 +95,9 @@ async function performAction(
   actionLoading.value = true
   try {
     const updated = await action(loanId)
-    // Actualizar en lista y en drawer
     const idx = loans.value.findIndex(l => l.id === loanId)
     if (idx !== -1) loans.value[idx] = updated
-    if (selectedLoan.value?.id === loanId) selectedLoan.value = await getLoan(loanId)
+    if (selectedLoan.value?.id === loanId) selectedLoan.value = updated
     toast.add({ severity: 'success', summary: 'Listo', detail: successMsg, life: 3000 })
   } catch {
     toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo realizar la acción.', life: 4000 })
@@ -83,12 +106,12 @@ async function performAction(
   }
 }
 
-// ── Eliminar solicitud ────────────────────────────────────────────────
+// ── Eliminar ──────────────────────────────────────────────────────────
 const showDeleteDialog = ref(false)
 const loanToDelete: Ref<LoanRequest | null> = ref(null)
 
 function confirmDelete(loan: LoanRequest) {
-  loanToDelete.value  = loan
+  loanToDelete.value    = loan
   showDeleteDialog.value = true
 }
 
@@ -113,7 +136,6 @@ onMounted(loadLoans)
 <template>
   <div class="page-container">
 
-    <!-- Cabecera -->
     <div class="page-header">
       <div>
         <h1 class="page-title">Gestión de Préstamos</h1>
@@ -121,7 +143,6 @@ onMounted(loadLoans)
       </div>
     </div>
 
-    <!-- Tabla -->
     <Card>
       <template #content>
         <DataTable :value="loans" :loading="loading" dataKey="id" stripedRows>
@@ -159,22 +180,21 @@ onMounted(loadLoans)
             <template #body="{ data }">{{ formatDate(data.requestDate) }}</template>
           </Column>
 
-          <Column header="Devolución estimada">
+          <Column header="Dev. estimada">
             <template #body="{ data }">
               {{ data.estimatedReturnDate ? formatDate(data.estimatedReturnDate) : '—' }}
             </template>
           </Column>
 
-          <!-- Acciones rápidas por estado -->
-          <Column header="Acciones" style="width: 200px">
+          <Column header="Acciones" style="width: 220px">
             <template #body="{ data }">
               <div class="action-buttons">
-                <!-- Ver detalle siempre -->
+
                 <Button icon="pi pi-eye" rounded text severity="info"
                   v-tooltip.top="'Ver detalle'" @click="openDetail(data)" />
 
-                <!-- pending → aprobar / rechazar -->
-                <template v-if="data.status?.name === 'pending'">
+                <!-- pendiente → aprobar / rechazar -->
+                <template v-if="data.status?.name === 'pendiente'">
                   <Button icon="pi pi-check" rounded text severity="success"
                     v-tooltip.top="'Aprobar'"
                     @click="performAction(approveLoan, data.id, 'Solicitud aprobada.')" />
@@ -183,21 +203,21 @@ onMounted(loadLoans)
                     @click="performAction(rejectLoan, data.id, 'Solicitud rechazada.')" />
                 </template>
 
-                <!-- approved → entregar -->
-                <Button v-if="data.status?.name === 'approved'"
+                <!-- aprobado → entregar -->
+                <Button v-if="data.status?.name === 'aprobado'"
                   icon="pi pi-send" rounded text severity="help"
                   v-tooltip.top="'Registrar entrega'"
                   @click="performAction(deliverLoan, data.id, 'Entrega registrada.')" />
 
-                <!-- delivered → devolver -->
-                <Button v-if="data.status?.name === 'delivered'"
+                <!-- prestado → devolver -->
+                <Button v-if="data.status?.name === 'prestado'"
                   icon="pi pi-undo" rounded text severity="secondary"
                   v-tooltip.top="'Registrar devolución'"
                   @click="performAction(returnLoan, data.id, 'Devolución registrada.')" />
 
-                <!-- Eliminar siempre -->
                 <Button icon="pi pi-trash" rounded text severity="danger"
                   v-tooltip.top="'Eliminar'" @click="confirmDelete(data)" />
+
               </div>
             </template>
           </Column>
@@ -206,7 +226,7 @@ onMounted(loadLoans)
       </template>
     </Card>
 
-    <!-- Drawer de detalle + timeline -->
+    <!-- Drawer -->
     <Drawer
       v-model:visible="showDrawer"
       header="Detalle de solicitud"
@@ -219,7 +239,6 @@ onMounted(loadLoans)
 
       <div v-else-if="selectedLoan" class="drawer-content">
 
-        <!-- Info básica -->
         <div class="loan-header">
           <div class="flex items-center gap-2 flex-wrap">
             <span class="loan-id">Solicitud #{{ selectedLoan.id }}</span>
@@ -235,7 +254,6 @@ onMounted(loadLoans)
           </p>
         </div>
 
-        <!-- Fechas -->
         <div class="dates-grid">
           <div class="date-item">
             <span class="date-label">Fecha solicitud</span>
@@ -256,20 +274,20 @@ onMounted(loadLoans)
         </div>
 
         <!-- Acciones desde drawer -->
-        <div v-if="['pending','approved','delivered'].includes(selectedLoan.status?.name)" class="drawer-actions">
-          <Button v-if="selectedLoan.status?.name === 'pending'"
+        <div v-if="['pendiente','aprobado','prestado'].includes(selectedLoan.status?.name)" class="drawer-actions">
+          <Button v-if="selectedLoan.status?.name === 'pendiente'"
             label="Aprobar" icon="pi pi-check" severity="success" size="small"
             :loading="actionLoading"
             @click="performAction(approveLoan, selectedLoan.id, 'Solicitud aprobada.')" />
-          <Button v-if="selectedLoan.status?.name === 'pending'"
+          <Button v-if="selectedLoan.status?.name === 'pendiente'"
             label="Rechazar" icon="pi pi-times" severity="danger" outlined size="small"
             :loading="actionLoading"
             @click="performAction(rejectLoan, selectedLoan.id, 'Solicitud rechazada.')" />
-          <Button v-if="selectedLoan.status?.name === 'approved'"
+          <Button v-if="selectedLoan.status?.name === 'aprobado'"
             label="Registrar entrega" icon="pi pi-send" severity="help" size="small"
             :loading="actionLoading"
             @click="performAction(deliverLoan, selectedLoan.id, 'Entrega registrada.')" />
-          <Button v-if="selectedLoan.status?.name === 'delivered'"
+          <Button v-if="selectedLoan.status?.name === 'prestado'"
             label="Registrar devolución" icon="pi pi-undo" size="small"
             :loading="actionLoading"
             @click="performAction(returnLoan, selectedLoan.id, 'Devolución registrada.')" />
@@ -308,7 +326,7 @@ onMounted(loadLoans)
 
     <!-- Dialog eliminar -->
     <Dialog v-model:visible="showDeleteDialog" header="Confirmar eliminación" modal :style="{ width: '380px' }">
-      <p>¿Eliminar la solicitud <strong>#{{ loanToDelete?.id }}</strong>? Esta acción no se puede deshacer.</p>
+      <p>¿Eliminar la solicitud <strong>#{{ loanToDelete?.id }}</strong>?</p>
       <template #footer>
         <Button label="Cancelar" severity="secondary" text @click="showDeleteDialog = false" />
         <Button label="Eliminar" severity="danger" icon="pi pi-trash" @click="handleDelete" />
@@ -323,28 +341,21 @@ onMounted(loadLoans)
 .page-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; }
 .page-title { font-size: 1.5rem; font-weight: 700; margin: 0; }
 .page-subtitle { font-size: 0.875rem; color: var(--p-text-muted-color); margin: 0.25rem 0 0; }
-
 .user-cell { display: flex; flex-direction: column; }
 .user-name { font-size: 0.875rem; font-weight: 500; }
 .user-username { font-size: 0.75rem; color: var(--p-text-muted-color); }
 .action-buttons { display: flex; gap: 0.1rem; flex-wrap: wrap; }
-
-/* Drawer */
 .drawer-content { display: flex; flex-direction: column; gap: 1.25rem; padding: 0.25rem 0; }
 .loan-header { display: flex; flex-direction: column; gap: 0.4rem; }
 .loan-id { font-weight: 700; font-size: 1rem; }
 .user-info-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.875rem; }
 .loan-reason { font-size: 0.875rem; color: var(--p-text-muted-color); margin: 0; }
-
 .dates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 .date-item { display: flex; flex-direction: column; gap: 0.2rem; }
 .date-label { font-size: 0.75rem; color: var(--p-text-muted-color); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
 .date-value { font-size: 0.875rem; }
-
 .drawer-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-
 .section-title { font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem; color: var(--p-text-muted-color); text-transform: uppercase; letter-spacing: 0.05em; }
-
 .timeline { display: flex; flex-direction: column; }
 .timeline-step { display: flex; align-items: flex-start; gap: 0.75rem; position: relative; padding-bottom: 1.25rem; }
 .timeline-step:last-child { padding-bottom: 0; }
@@ -356,7 +367,6 @@ onMounted(loadLoans)
 .timeline-date { font-size: 0.75rem; color: var(--p-text-muted-color); }
 .timeline-line { position: absolute; left: 15px; top: 32px; width: 2px; height: calc(100% - 16px); background: var(--p-surface-200, #e2e8f0); z-index: 0; }
 .timeline-step.done .timeline-line { background: var(--p-green-200, #bbf7d0); }
-
 .devices-list { display: flex; flex-direction: column; gap: 0.5rem; }
 .device-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.75rem; border-radius: 8px; background: var(--p-surface-50, rgba(0,0,0,0.02)); border: 1px solid var(--p-surface-100, rgba(0,0,0,0.05)); }
 .device-info { display: flex; flex-direction: column; gap: 0.1rem; }

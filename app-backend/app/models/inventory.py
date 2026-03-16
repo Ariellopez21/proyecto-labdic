@@ -186,15 +186,20 @@ class LoanRequest(Base):
 
     user: Mapped["User"] = relationship("User", back_populates="loan_requests")
     status: Mapped["Status"] = relationship("Status", back_populates="loan_requests")
-    loan_request_items: Mapped[list["LoanRequestItem"]] = relationship("LoanRequestItem", back_populates="loan_request")  # noqa: E501
-
+    loan_request_items: Mapped[list["LoanRequestItem"]] = relationship(
+        "LoanRequestItem",
+        back_populates="loan_request",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
 class LoanRequestItem(Base):
     """Para gestionar los elementos de las solicitudes de préstamo, individualmente."""
 
     __tablename__ = "loan_request_items"
-
     id: Mapped[int] = mapped_column(primary_key=True)
-    loan_request_id: Mapped[int] = mapped_column(ForeignKey("loan_requests.id"))
+    loan_request_id: Mapped[int] = mapped_column(
+        ForeignKey("loan_requests.id", ondelete="CASCADE")
+    )
     device_id: Mapped[int] = mapped_column(
         ForeignKey("devices.id", ondelete="CASCADE")
     )

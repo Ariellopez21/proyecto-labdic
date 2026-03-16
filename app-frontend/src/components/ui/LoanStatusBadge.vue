@@ -5,18 +5,18 @@ const props = defineProps<{ status: string }>()
 
 const config = computed(() => {
   switch (props.status.toLowerCase()) {
-    case 'pending':
-      return { label: 'Pendiente',   severity: 'warn',      icon: 'pi pi-clock' }
-    case 'approved':
-      return { label: 'Aprobado',    severity: 'success',   icon: 'pi pi-check-circle' }
-    case 'rejected':
-      return { label: 'Rechazado',   severity: 'danger',    icon: 'pi pi-times-circle' }
-    case 'delivered':
-      return { label: 'Entregado',   severity: 'info',      icon: 'pi pi-send' }
-    case 'returned':
-      return { label: 'Devuelto',    severity: 'secondary', icon: 'pi pi-undo' }
+    case 'pendiente':
+      return { label: 'Pendiente',  severity: 'warn' }
+    case 'aprobado':
+      return { label: 'Aprobado',   severity: 'success' }
+    case 'rechazado':
+      return { label: 'Rechazado',  severity: 'danger' }
+    case 'prestado':
+      return { label: 'Entregado',  severity: 'info' }
+    case 'devuelto':
+      return { label: 'Devuelto',   severity: 'secondary' }
     default:
-      return { label: props.status,  severity: 'secondary', icon: 'pi pi-circle' }
+      return { label: props.status, severity: 'secondary' }
   }
 })
 </script>

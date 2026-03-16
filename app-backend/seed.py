@@ -97,6 +97,8 @@ def seed_statuses(session: Session) -> None:
         Status(name="disponible"),
         Status(name="prestado"),
         Status(name="en_mantenimiento"),
+        Status(name="entregado"),
+        Status(name="devuelto"),
         # Estados de solicitudes
         Status(name="pendiente"),
         Status(name="aprobado"),

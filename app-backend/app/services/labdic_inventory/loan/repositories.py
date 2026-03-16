@@ -18,19 +18,32 @@ class LoanRequestRepository(SQLAlchemySyncRepository[LoanRequest]):
         status = self.session.execute(stmt).scalar_one()
         return status.id
 
-    def get_with_relations(self, loan_id: int) -> LoanRequest:
-        """Obtiene una solicitud con todas sus relaciones cargadas."""
-        stmt = (
+    def _base_stmt(self):
+        """Statement base con relaciones cargadas para todos los métodos de lista."""
+        return (
             select(LoanRequest)
             .options(
                 selectinload(LoanRequest.user),
                 selectinload(LoanRequest.status),
-                selectinload(LoanRequest.loan_request_items).selectinload(
-                    LoanRequestItem.device
-                ).selectinload(Device.product),
+                selectinload(LoanRequest.loan_request_items)
+                    .selectinload(LoanRequestItem.device)
+                    .selectinload(Device.product),
             )
-            .where(LoanRequest.id == loan_id)
         )
+
+    def list_with_relations(self) -> list[LoanRequest]:
+        """Lista todas las solicitudes con relaciones cargadas."""
+        stmt = self._base_stmt().order_by(LoanRequest.id.desc())
+        return list(self.session.execute(stmt).scalars().all())
+
+    def list_mine(self, user_id: int) -> list[LoanRequest]:
+        """Lista las solicitudes del usuario autenticado."""
+        stmt = self._base_stmt().where(LoanRequest.user_id == user_id).order_by(LoanRequest.id.desc())
+        return list(self.session.execute(stmt).scalars().all())
+
+    def get_with_relations(self, loan_id: int) -> LoanRequest:
+        """Obtiene una solicitud con todas sus relaciones cargadas."""
+        stmt = self._base_stmt().where(LoanRequest.id == loan_id)
         return self.session.execute(stmt).scalar_one()
 
     def create_with_items(
@@ -40,10 +53,7 @@ class LoanRequestRepository(SQLAlchemySyncRepository[LoanRequest]):
         reason: str | None,
         estimated_return_date: datetime | None,
     ) -> LoanRequest:
-        """Crea una solicitud de préstamo con sus items en una sola transacción.
-
-        El status inicial es 'pendiente'.
-        """
+        """Crea una solicitud de préstamo con sus items en una sola transacción."""
         status_id = self._get_status_id("pendiente")
 
         loan = LoanRequest(
@@ -54,7 +64,7 @@ class LoanRequestRepository(SQLAlchemySyncRepository[LoanRequest]):
             request_date=datetime.now(timezone.utc),
         )
         self.session.add(loan)
-        self.session.flush()  # para obtener loan.id antes de crear los items
+        self.session.flush()
 
         for device_id in device_ids:
             item = LoanRequestItem(
@@ -64,89 +74,66 @@ class LoanRequestRepository(SQLAlchemySyncRepository[LoanRequest]):
             self.session.add(item)
 
         self.session.commit()
-        return loan
+        return self.get_with_relations(loan.id)
 
     def approve(self, loan_id: int) -> LoanRequest:
         """Aprueba una solicitud de préstamo."""
         status_id = self._get_status_id("aprobado")
-        loan, _ = self.get_and_update(
-            id=loan_id,
-            status_id=status_id,
-            match_fields=["id"],
-            auto_commit=True,
-        )
-        return loan
+        self.get_and_update(id=loan_id, status_id=status_id, match_fields=["id"], auto_commit=True)
+        return self.get_with_relations(loan_id)
 
     def reject(self, loan_id: int) -> LoanRequest:
         """Rechaza una solicitud de préstamo."""
         status_id = self._get_status_id("rechazado")
-        loan, _ = self.get_and_update(
-            id=loan_id,
-            status_id=status_id,
-            match_fields=["id"],
-            auto_commit=True,
-        )
-        return loan
+        self.get_and_update(id=loan_id, status_id=status_id, match_fields=["id"], auto_commit=True)
+        return self.get_with_relations(loan_id)
 
     def deliver(self, loan_id: int) -> LoanRequest:
-        """Registra la entrega de los dispositivos al usuario.
-
-        - Llena delivery_date con la fecha actual.
-        - Cambia el status de la solicitud a 'prestado'.
-        - Cambia el status de cada device involucrado a 'prestado'.
-        """
+        """Registra la entrega de los dispositivos al usuario."""
         prestado_id = self._get_status_id("prestado")
 
-        # Actualizar la solicitud
-        loan, _ = self.get_and_update(
+        self.get_and_update(
             id=loan_id,
             status_id=prestado_id,
             delivery_date=datetime.now(timezone.utc),
             match_fields=["id"],
         )
 
-        # Cambiar status de cada device a 'prestado'
         items = self.session.execute(
             select(LoanRequestItem).where(LoanRequestItem.loan_request_id == loan_id)
         ).scalars().all()
 
         for item in items:
             device = self.session.get(Device, item.device_id)
-            if device is None:
-                raise ValueError(f"Device {item.device_id} no encontrado.")
-            device.status_id = prestado_id
+            if device:
+                device.status_id = prestado_id
 
         self.session.commit()
-        return loan
+        return self.get_with_relations(loan_id)
 
     def register_return(self, loan_id: int) -> LoanRequest:
-        """Registra la devolución de los dispositivos.
-
-        - Llena actual_return_date con la fecha actual.
-        - Cambia el status de cada device involucrado a 'disponible'.
-        """
+        """Registra la devolución de los dispositivos."""
         disponible_id = self._get_status_id("disponible")
+        devuelto_id   = self._get_status_id("devuelto")  # ← fix: actualizar status de la solicitud
 
-        # Actualizar la solicitud
-        loan, _ = self.get_and_update(
+        self.get_and_update(
             id=loan_id,
+            status_id=devuelto_id,              # ← fix: estaba faltando esto
             actual_return_date=datetime.now(timezone.utc),
             match_fields=["id"],
         )
 
-        # Cambiar status de cada device a 'disponible'
         items = self.session.execute(
             select(LoanRequestItem).where(LoanRequestItem.loan_request_id == loan_id)
         ).scalars().all()
 
         for item in items:
             device = self.session.get(Device, item.device_id)
-            if device is None:
-                raise ValueError(f"Device {item.device_id} no encontrado.")
-            device.status_id = disponible_id
+            if device:
+                device.status_id = disponible_id
 
         self.session.commit()
-        return loan
+        return self.get_with_relations(loan_id)
 
 
 def provide_loan_repository(db_session: Session) -> LoanRequestRepository:

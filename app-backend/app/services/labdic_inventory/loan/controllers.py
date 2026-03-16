@@ -17,7 +17,6 @@ from .repositories import LoanRequestRepository, provide_loan_repository
 
 
 def admin_guard(connection: ASGIConnection, _: BaseRouteHandler) -> None:
-    """Restringe acceso a administradores."""
     if not connection.user.is_admin:
         raise HTTPException(status_code=403, detail="No autorizado.")
 
@@ -35,8 +34,8 @@ class LoanRequestController(Controller):
 
     @get(path="/", summary="ListLoanRequests", guards=[admin_guard])
     async def list(self, loans_repo: LoanRequestRepository) -> Sequence[LoanRequest]:
-        """Lista todas las solicitudes. Solo administradores."""
-        return loans_repo.list()
+        """Lista todas las solicitudes con relaciones. Solo administradores."""
+        return loans_repo.list_with_relations()
 
     @get(path="/me", summary="ListMyLoanRequests")
     async def list_mine(
@@ -44,8 +43,8 @@ class LoanRequestController(Controller):
         request: Request[User, Token, Any],
         loans_repo: LoanRequestRepository,
     ) -> Sequence[LoanRequest]:
-        """Lista las solicitudes del usuario autenticado."""
-        return loans_repo.list(user_id=request.user.id)
+        """Lista las solicitudes del usuario autenticado con relaciones."""
+        return loans_repo.list_mine(user_id=request.user.id)
 
     @get(path="/{loan_id:int}", summary="GetLoanRequest")
     async def fetch(self, loan_id: int, loans_repo: LoanRequestRepository) -> LoanRequest:
@@ -59,7 +58,7 @@ class LoanRequestController(Controller):
         request: Request[User, Token, Any],
         loans_repo: LoanRequestRepository,
     ) -> LoanRequest:
-        """Crea una solicitud de préstamo. Cualquier usuario autenticado."""
+        """Crea una solicitud de préstamo."""
         return loans_repo.create_with_items(
             user_id=request.user.id,
             device_ids=data.device_ids,
@@ -69,25 +68,20 @@ class LoanRequestController(Controller):
 
     @patch(path="/{loan_id:int}/approve", summary="ApproveLoanRequest", guards=[admin_guard])
     async def approve(self, loan_id: int, loans_repo: LoanRequestRepository) -> LoanRequest:
-        """Aprueba una solicitud. Solo administradores."""
         return loans_repo.approve(loan_id)
 
     @patch(path="/{loan_id:int}/reject", summary="RejectLoanRequest", guards=[admin_guard])
     async def reject(self, loan_id: int, loans_repo: LoanRequestRepository) -> LoanRequest:
-        """Rechaza una solicitud. Solo administradores."""
         return loans_repo.reject(loan_id)
 
     @patch(path="/{loan_id:int}/deliver", summary="DeliverLoanRequest", guards=[admin_guard])
     async def deliver(self, loan_id: int, loans_repo: LoanRequestRepository) -> LoanRequest:
-        """Registra la entrega de dispositivos. Solo administradores."""
         return loans_repo.deliver(loan_id)
 
     @patch(path="/{loan_id:int}/return", summary="ReturnLoanRequest", guards=[admin_guard])
     async def register_return(self, loan_id: int, loans_repo: LoanRequestRepository) -> LoanRequest:
-        """Registra la devolución de dispositivos. Solo administradores."""
         return loans_repo.register_return(loan_id)
 
     @delete(path="/{loan_id:int}", summary="DeleteLoanRequest", guards=[admin_guard])
     async def delete(self, loan_id: int, loans_repo: LoanRequestRepository) -> None:
-        """Elimina una solicitud. Solo administradores."""
         loans_repo.delete(loan_id, auto_commit=True)

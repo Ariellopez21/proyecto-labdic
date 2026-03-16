@@ -11,7 +11,16 @@ from app.models.inventory import LoanRequest
 
 class LoanRequestReadDTO(SQLAlchemyDTO[LoanRequest]):
     config = SQLAlchemyDTOConfig(
-        exclude={"loan_request_items"},
+        exclude={
+            "user.password",
+            "user.roles", 
+            "user.loan_requests",
+            "user.status_logs",
+            "loan_request_items.loan_request",
+            "loan_request_items.device.loan_request_items",
+            "loan_request_items.device.status_logs",
+            "loan_request_items.device.product.devices",
+        },
         partial=True,
     )
 

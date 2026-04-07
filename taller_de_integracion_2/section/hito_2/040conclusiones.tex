@@ -1,5 +1,22 @@
 \section{Conclusión}
 
-El modelo de base de datos desarrollado cumple con los principios fundamentales de modularidad, coherencia estructural y buenas prácticas de diseño. Las tablas fueron definidas de manera clara y consistente, reflejando adecuadamente los procesos del sistema de inventario y permitiendo una gestión precisa tanto de usuarios como de productos y solicitudes de préstamo. El diagrama Entidad–Relación confirma la solidez del esquema y la correcta articulación entre sus componentes.
+El modelo de base de datos desarrollado refleja una evolución natural desde una 
+concepción inicial de tres grandes ejes funcionales hacia una arquitectura de seis 
+módulos cohesivos: Usuarios, Autenticación, Catálogo, Productos, Dispositivos y 
+Préstamos. Esta subdivisión no responde a una decisión arbitraria, sino a la 
+complejidad real de las interacciones entre entidades, que hizo necesario dividir 
+responsabilidades para mantener un diseño limpio, mantenible y escalable.
 
-Asimismo, la integración de SQLAlchemy y Alembic provee un marco robusto para la evolución continua del sistema, asegurando que cualquier cambio futuro quede documentado y pueda aplicarse mediante migraciones controladas. Con esta base, queda establecido el esqueleto técnico necesario para avanzar hacia el desarrollo completo del proyecto, integrando el backend y posteriormente el frontend, garantizando que ambos interactúen de forma adecuada con un modelo de datos bien estructurado y preparado para crecer.
+Un aspecto destacable del modelo es que la modularidad adoptada es de naturaleza 
+conceptual: el módulo de Autenticación, por ejemplo, no requiere tablas propias, 
+sino que se expresa a través de campos específicos de la tabla \texttt{users} y su 
+relación con \texttt{roles}. Esto evidencia que un módulo se define por la 
+responsabilidad funcional que agrupa, no por la cantidad de tablas que lo componen.
+
+La integración de SQLAlchemy y Alembic provee un marco robusto para la evolución 
+continua del esquema, asegurando que cualquier cambio quede documentado y pueda 
+aplicarse mediante migraciones controladas. El diagrama Entidad–Relación confirma 
+la solidez del modelo y la correcta articulación entre sus componentes. Con esta 
+base, queda establecido el esqueleto técnico necesario para avanzar hacia el 
+desarrollo del backend y posteriormente del frontend, garantizando que ambas capas 
+interactúen con un modelo de datos bien estructurado y preparado para crecer.

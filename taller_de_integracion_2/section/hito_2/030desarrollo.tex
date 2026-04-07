@@ -1,40 +1,79 @@
 \section{Grandes grupos funcionales}\label{sec:grandes_grupos}
 
-Para poder llevar a cabo los objetivos, el modelo de base de datos se organiza en torno a tres grandes grupos funcionales que reflejan el funcionamiento del sistema:
+En una primera aproximación, el sistema puede describirse en torno a tres grandes 
+ejes funcionales: los \textbf{usuarios} interactúan con el sistema para solicitar 
+un \textbf{préstamo} de \textbf{productos}, y dichas solicitudes son gestionadas 
+por los administradores hasta concretar la entrega y registrar la devolución.
 
-Los \textbf{usuarios} interactúan con el sistema para solicitar un \textbf{préstamo} de \textbf{productos}, y dichas solicitudes son gestionadas por los administradores hasta concretar el préstamo y registrar su devolución.
+Sin embargo, a medida que el diseño avanza, la complejidad de las interacciones 
+entre entidades evidencia la necesidad de subdividir estos grandes ejes en módulos 
+más pequeños y cohesivos. Este enfoque de \textit{dividir para vencer} permite que 
+cada módulo tenga una responsabilidad bien definida, reduzca el acoplamiento entre 
+tablas y facilite tanto el mantenimiento como la extensión futura del sistema.
 
-En el cuadro ~\ref{tab:grandes_grupos_funcionales} se resumen estos grupos y las entidades principales asociadas a cada uno de ellos.
+Así, el modelo de base de datos final se organiza en seis módulos funcionales, 
+cuyas entidades y relaciones se describen en el cuadro~\ref{tab:grandes_grupos_funcionales}.
 
 \begin{table}[H]
-  \centering
-  \begin{tabular}{p{0.16\linewidth}p{0.34\linewidth}p{0.38\linewidth}}
-    \hline
-    \textbf{Grupo} & \textbf{Propósito principal} & \textbf{Entidades representativas} \\
-    \hline
-    Usuarios (\texttt{users}) & Gestionar la identidad, el rol y los permisos de quienes interactúan con el sistema. 
-                     & \texttt{users}, \texttt{roles} \\
-    \hline
-    Productos (\texttt{products}) & Representar el inventario de ítems prestables y su estado dentro del laboratorio. 
-                         & \texttt{products}, \texttt{devices}, \texttt{statuses}, \texttt{device\_status\_log}, \texttt{ubications}, \texttt{brands}, , \texttt{categories}, \texttt{models} \\
-    \hline
-    Préstamos (\texttt{loans}) & Modelar el ciclo de vida de los préstamos y su historial asociado. 
-                      & \texttt{loan\_request}, \texttt{loan\_request\_item}, \texttt{statuses}, \texttt{device\_status\_log} \\
-    \hline
-  \end{tabular}
-  \caption{Grandes grupos funcionales del modelo de datos de LabDIC.}
-  \label{tab:grandes_grupos_funcionales}
+	\centering
+	\begin{tabular}{p{0.17\linewidth}p{0.34\linewidth}p{0.37\linewidth}}
+		\hline
+		\textbf{Módulo} & \textbf{Propósito principal} & \textbf{Entidades representativas} \\
+		\hline
+		Usuarios & Gestionar la identidad, credenciales y datos personales de quienes 
+		interactúan con el sistema.
+		& \texttt{users}, \texttt{user\_roles} \\
+		\hline
+		Autenticación & Controlar el acceso mediante credenciales cifradas y permisos 
+		por rol, sin requerir tablas adicionales: se implementa a través de campos 
+		específicos del modelo de usuario.
+		& Campos \texttt{password}, \texttt{is\_active}, \texttt{is\_admin} en \texttt{users} \\
+		\hline
+		Catálogo & Centralizar los datos de referencia reutilizables por otros módulos 
+		del sistema, evitando redundancia y facilitando la administración. Incluye 
+		\texttt{roles}, que inicialmente pertenecía al módulo de usuarios pero fue 
+		reubicado aquí por compartir la misma naturaleza de dato de referencia con 
+		funcionalidades CRUD simples y acotadas.
+		& \texttt{roles}, \texttt{brands}, \texttt{models}, \texttt{categories}, 
+		\texttt{statuses}, \texttt{ubications} \\
+		\hline
+		Productos & Representar los tipos de ítems disponibles para préstamo y sus 
+		características descriptivas.
+		& \texttt{products} \\
+		\hline
+		Dispositivos & Administrar las unidades físicas individuales del inventario, 
+		su estado actual y el historial de cambios de estado.
+		& \texttt{devices}, \texttt{device\_status\_logs} \\
+		\hline
+		Préstamos & Modelar el ciclo de vida completo de las solicitudes de préstamo, 
+		desde la solicitud inicial hasta la devolución.
+		& \texttt{loan\_requests}, \texttt{loan\_request\_items} \\
+		\hline
+	\end{tabular}
+	\caption{Módulos funcionales del modelo de datos de LabDIC.}
+	\label{tab:grandes_grupos_funcionales}
 \end{table}
+
+Cabe destacar que la tabla \texttt{statuses} es transversal al modelo: sus registros 
+son referenciados tanto por \texttt{devices} como por \texttt{loan\_requests} y 
+\texttt{device\_status\_logs}, lo que refleja que el concepto de \textit{estado} 
+opera como un eje compartido entre los módulos de dispositivos y préstamos.
 
 \section{División en tablas modulares}\label{sec:div_tablas_modulares}
 
-Los cambios futuros en la estructura de esta tabla, como la adición de nuevos campos o modificaciones en los existentes, se gestionarán fácilmente mediante el uso de migraciones controladas por Alembic, garantizando que el modelo de datos se mantenga escalable y flexible frente a futuros requerimientos.
+Cada módulo funcional se implementa mediante una o más tablas, diseñadas para 
+ser cohesivas internamente y débilmente acopladas entre sí. Las relaciones entre 
+módulos se establecen a través de claves foráneas, preservando la integridad 
+referencial del modelo. Cualquier cambio estructural futuro en el esquema se 
+gestiona mediante migraciones controladas con Alembic, garantizando trazabilidad 
+y consistencia a lo largo del ciclo de vida del proyecto.
 
 \subsection{Módulo de Usuarios}
 
+El módulo de usuarios está diseñado para gestionar la autenticación, control de acceso y roles dentro del sistema. La tabla \texttt{users} almacena la información básica de cada usuario, incluyendo sus datos personales, credenciales y el estado de su cuenta. Este modelo permite identificar de manera única a los usuarios mediante su RUT, nombre de usuario o correo electrónico, y controlar el acceso a las funcionalidades del sistema a través de campos como \texttt{is\_active} e \texttt{is\_admin}.
+
 \subsubsection{Tabla usuarios}
 
-El módulo de usuarios está diseñado para gestionar la autenticación, control de acceso y roles dentro del sistema. La tabla \texttt{users} almacena la información básica de cada usuario, incluyendo sus datos personales, credenciales y el estado de su cuenta. Este modelo permite identificar de manera única a los usuarios mediante su RUT, nombre de usuario o correo electrónico, y controlar el acceso a las funcionalidades del sistema a través de campos como \texttt{is\_active} e \texttt{is\_admin}.
 
 \begin{table}[H]
   \centering
@@ -69,6 +108,48 @@ El módulo de usuarios está diseñado para gestionar la autenticación, control
   \label{tab:tabla_users}
 \end{table}
 
+\subsubsection{Tabla user\_roles}
+
+La tabla \texttt{user\_roles} actúa como tabla intermedia que resuelve la relación 
+muchos a muchos entre usuarios y roles. Un usuario puede tener múltiples roles 
+asignados y un mismo rol puede estar asociado a múltiples usuarios. Su estructura 
+es deliberadamente minimalista, limitándose a las claves foráneas necesarias para 
+establecer dicha asociación.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+		\hline
+		\textbf{Campo} & \textbf{Descripción} \\
+		\hline
+		\texttt{user\_id} & Clave foránea que referencia a \texttt{users.id}. 
+		Forma parte de la clave primaria compuesta. \\
+		\hline
+		\texttt{role\_id} & Clave foránea que referencia a \texttt{roles.id}. 
+		Forma parte de la clave primaria compuesta. \\
+		\hline
+	\end{tabular}
+	\caption{Estructura de la tabla intermedia \texttt{user\_roles}.}
+	\label{tab:tabla_user_roles}
+\end{table}
+
+\subsection{Módulo de Autenticación}
+
+El módulo de autenticación no requiere tablas propias en el esquema relacional. 
+Su implementación se sustenta en campos específicos de la tabla \texttt{users}: 
+\texttt{password} almacena la contraseña cifrada mediante hashing, mientras que 
+\texttt{is\_active} e \texttt{is\_admin} controlan el estado de la cuenta y el 
+nivel de acceso del usuario respectivamente. Complementariamente, la relación 
+muchos a muchos con \texttt{roles} a través de \texttt{user\_roles} permite 
+implementar un control de acceso granular basado en roles.
+
+Este módulo ilustra que la modularidad del sistema no se define exclusivamente 
+por la cantidad de tablas que lo componen, sino por la responsabilidad funcional 
+que agrupa: en este caso, garantizar que solo usuarios válidos y autorizados 
+puedan operar el sistema.
+
+\subsection{Módulo de Catálogo}
+
 \subsubsection{Tabla de roles}
 
 La tabla \texttt{roles} se encarga de almacenar los diferentes roles que los usuarios pueden tener dentro del sistema. Cada rol tiene un nombre único y una descripción opcional que explica sus permisos o funciones dentro del sistema. Esta tabla permite gestionar y asignar roles a los usuarios, facilitando el control de acceso y la administración de permisos.
@@ -91,6 +172,104 @@ La tabla \texttt{roles} se encarga de almacenar los diferentes roles que los usu
 \end{table}
 
 La gestión de roles es fundamental para la administración de permisos en el sistema. A través de esta tabla, se pueden asignar diferentes capacidades a los usuarios según el rol que se les asigne, asegurando un control adecuado sobre el acceso y las funcionalidades disponibles para cada tipo de usuario.
+
+\subsubsection{Tabla de marcas}
+
+La tabla \texttt{brands} almacena las marcas asociadas a los productos. Cada marca tiene un nombre único, lo que permite categorizar los productos según su fabricante. Esta tabla está relacionada con la tabla \texttt{products}, de modo que cada producto puede tener una marca específica.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+		\hline
+		\textbf{Campo} & \textbf{Descripción} \\
+		\hline
+		\texttt{id} & Identificador único de la marca. Es la clave primaria de la tabla. \\
+		\hline
+		\texttt{name} & Nombre de la marca, utilizado para identificarla de manera única dentro del sistema (por ejemplo, 'Dell', 'HP', 'Apple'). Este campo es obligatorio y único. \\
+		\hline
+	\end{tabular}
+	\caption{Estructura de la tabla \texttt{brands}.}
+	\label{tab:tabla_brands}
+\end{table}
+
+\subsubsection{Tabla de modelos}
+
+La tabla \texttt{models} almacena los modelos de los productos. Cada modelo tiene un nombre único y está relacionado con los productos disponibles en el inventario. Al igual que la tabla de marcas, los productos pueden estar asociados a un modelo específico.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+		\hline
+		\textbf{Campo} & \textbf{Descripción} \\
+		\hline
+		\texttt{id} & Identificador único del modelo. Es la clave primaria de la tabla. \\
+		\hline
+		\texttt{name} & Nombre del modelo (por ejemplo, 'XPS 13', 'Spectre x360', 'MacBook Pro'). Este campo es obligatorio y único. \\
+		\hline
+	\end{tabular}
+	\caption{Estructura de la tabla \texttt{models}.}
+	\label{tab:tabla_models}
+\end{table}
+
+\subsubsection{Tabla de categorías}
+
+La tabla \texttt{categories} agrupa los productos en categorías específicas, como 'Laptops', 'Tablets' o 'Smartphones'. Esto facilita la organización y búsqueda de productos dentro del inventario.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+		\hline
+		\textbf{Campo} & \textbf{Descripción} \\
+		\hline
+		\texttt{id} & Identificador único de la categoría. Es la clave primaria de la tabla. \\
+		\hline
+		\texttt{name} & Nombre de la categoría (por ejemplo, 'Laptops', 'Tablets', 'Smartphones'). Este campo es obligatorio y único. \\
+		\hline
+	\end{tabular}
+	\caption{Estructura de la tabla \texttt{categories}.}
+	\label{tab:tabla_categories}
+\end{table}
+
+\subsubsection{Tabla de estados}\label{sec:statuses}
+
+La tabla \texttt{statuses} permite gestionar los diferentes estados de los dispositivos y las solicitudes asociadas, como 'available', 'borrowed', 'under maintenance', entre otros. Los estados se utilizan para rastrear el ciclo de vida de cada dispositivo y solicitud dentro del sistema.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+		\hline
+		\textbf{Campo} & \textbf{Descripción} \\
+		\hline
+		\texttt{id} & Identificador único del estado. Es la clave primaria de la tabla. \\
+		\hline
+		\texttt{name} & Nombre del estado (por ejemplo, 'available', 'borrowed', 'under maintenance'). Este campo es obligatorio y único. \\
+		\hline
+	\end{tabular}
+	\caption{Estructura de la tabla \texttt{statuses}.}
+	\label{tab:tabla_statuses}
+\end{table}
+
+\subsubsection{Tabla de ubicaciones}
+
+La tabla \texttt{ubications} gestiona las ubicaciones físicas de los dispositivos dentro del sistema. Cada ubicación tiene un nombre y una descripción opcional, lo que permite identificar fácilmente el lugar donde se encuentra cada dispositivo.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
+		\hline
+		\textbf{Campo} & \textbf{Descripción} \\
+		\hline
+		\texttt{id} & Identificador único de la ubicación. Es la clave primaria de la tabla. \\
+		\hline
+		\texttt{name} & Nombre de la ubicación (por ejemplo, 'TI-1', 'Sala de servidores', 'Administración'). Este campo es obligatorio y único. \\
+		\hline
+		\texttt{description} & Descripción detallada de la ubicación. Este campo es opcional y proporciona información adicional sobre la ubicación. \\
+		\hline
+	\end{tabular}
+	\caption{Estructura de la tabla \texttt{ubications}.}
+	\label{tab:tabla_ubications}
+\end{table}
+
 
 \subsection{Módulo de Productos}
 
@@ -131,62 +310,8 @@ La tabla \texttt{products} es fundamental para el control del inventario, ya que
 
 La tabla \texttt{products} es clave para el manejo eficiente del inventario y la gestión de los préstamos. Permite mantener un registro detallado de todos los productos, su disponibilidad y las características asociadas, y está diseñada para ser fácilmente ampliable en caso de que sea necesario agregar más atributos o relaciones con otras tablas.
 
-\subsubsection{Tabla de marcas}
+\subsection{Módulo de Dispositivos}
 
-La tabla \texttt{brands} almacena las marcas asociadas a los productos. Cada marca tiene un nombre único, lo que permite categorizar los productos según su fabricante. Esta tabla está relacionada con la tabla \texttt{products}, de modo que cada producto puede tener una marca específica.
-
-\begin{table}[H]
-  \centering
-  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
-    \hline
-    \textbf{Campo} & \textbf{Descripción} \\
-    \hline
-    \texttt{id} & Identificador único de la marca. Es la clave primaria de la tabla. \\
-    \hline
-    \texttt{name} & Nombre de la marca, utilizado para identificarla de manera única dentro del sistema (por ejemplo, 'Dell', 'HP', 'Apple'). Este campo es obligatorio y único. \\
-    \hline
-  \end{tabular}
-  \caption{Estructura de la tabla \texttt{brands}.}
-  \label{tab:tabla_brands}
-\end{table}
-
-\subsubsection{Tabla de modelos}
-
-La tabla \texttt{models} almacena los modelos de los productos. Cada modelo tiene un nombre único y está relacionado con los productos disponibles en el inventario. Al igual que la tabla de marcas, los productos pueden estar asociados a un modelo específico.
-
-\begin{table}[H]
-  \centering
-  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
-    \hline
-    \textbf{Campo} & \textbf{Descripción} \\
-    \hline
-    \texttt{id} & Identificador único del modelo. Es la clave primaria de la tabla. \\
-    \hline
-    \texttt{name} & Nombre del modelo (por ejemplo, 'XPS 13', 'Spectre x360', 'MacBook Pro'). Este campo es obligatorio y único. \\
-    \hline
-  \end{tabular}
-  \caption{Estructura de la tabla \texttt{models}.}
-  \label{tab:tabla_models}
-\end{table}
-
-\subsubsection{Tabla de categorías}
-
-La tabla \texttt{categories} agrupa los productos en categorías específicas, como 'Laptops', 'Tablets' o 'Smartphones'. Esto facilita la organización y búsqueda de productos dentro del inventario.
-
-\begin{table}[H]
-  \centering
-  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
-    \hline
-    \textbf{Campo} & \textbf{Descripción} \\
-    \hline
-    \texttt{id} & Identificador único de la categoría. Es la clave primaria de la tabla. \\
-    \hline
-    \texttt{name} & Nombre de la categoría (por ejemplo, 'Laptops', 'Tablets', 'Smartphones'). Este campo es obligatorio y único. \\
-    \hline
-  \end{tabular}
-  \caption{Estructura de la tabla \texttt{categories}.}
-  \label{tab:tabla_categories}
-\end{table}
 
 \subsubsection{Tabla de dispositivos}
 
@@ -219,45 +344,6 @@ El motivo del nombre \textbf{dispositivo} surge a partir de que en el entorno de
   \label{tab:tabla_devices}
 \end{table}
 
-\subsubsection{Tabla de estados}\label{sec:statuses}
-
-La tabla \texttt{statuses} permite gestionar los diferentes estados de los dispositivos y las solicitudes asociadas, como 'available', 'borrowed', 'under maintenance', entre otros. Los estados se utilizan para rastrear el ciclo de vida de cada dispositivo y solicitud dentro del sistema.
-
-\begin{table}[H]
-  \centering
-  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
-    \hline
-    \textbf{Campo} & \textbf{Descripción} \\
-    \hline
-    \texttt{id} & Identificador único del estado. Es la clave primaria de la tabla. \\
-    \hline
-    \texttt{name} & Nombre del estado (por ejemplo, 'available', 'borrowed', 'under maintenance'). Este campo es obligatorio y único. \\
-    \hline
-  \end{tabular}
-  \caption{Estructura de la tabla \texttt{statuses}.}
-  \label{tab:tabla_statuses}
-\end{table}
-
-\subsubsection{Tabla de ubicaciones}
-
-La tabla \texttt{ubications} gestiona las ubicaciones físicas de los dispositivos dentro del sistema. Cada ubicación tiene un nombre y una descripción opcional, lo que permite identificar fácilmente el lugar donde se encuentra cada dispositivo.
-
-\begin{table}[H]
-  \centering
-  \begin{tabular}{|p{0.25\linewidth}|p{0.7\linewidth}|}
-    \hline
-    \textbf{Campo} & \textbf{Descripción} \\
-    \hline
-    \texttt{id} & Identificador único de la ubicación. Es la clave primaria de la tabla. \\
-    \hline
-    \texttt{name} & Nombre de la ubicación (por ejemplo, 'TI-1', 'Sala de servidores', 'Administración'). Este campo es obligatorio y único. \\
-    \hline
-    \texttt{description} & Descripción detallada de la ubicación. Este campo es opcional y proporciona información adicional sobre la ubicación. \\
-    \hline
-  \end{tabular}
-  \caption{Estructura de la tabla \texttt{ubications}.}
-  \label{tab:tabla_ubications}
-\end{table}
 
 \subsubsection{Tabla de registros de cambios de estado de dispositivos}\label{sec:device_status_logs}
 

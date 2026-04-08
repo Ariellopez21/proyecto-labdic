@@ -1,17 +1,37 @@
 \section{Objetivos}
 
 \subsection{Objetivo general}
-Describir la implementación completa del módulo de usuarios, asegurando su correcta integración tanto con el backend como con el frontend, destacando que al final del hito se debe contar con un módulo robusto que sirva como referencia para implementar los módulos restantes (productos y préstamos).
+
+Implementar el backend completo del sistema, desarrollando los servicios, repositorios, 
+DTOs y controladores de los seis módulos funcionales (Usuarios, Autenticación, Catálogo, 
+Productos, Dispositivos y Préstamos), exponiendo la API REST documentada 
+que sirva como base para el desarrollo del frontend en los hitos siguientes.
 
 \subsection{Objetivos específicos}
+
 \begin{itemize}
-	\item Definir la arquitectura del módulo de usuarios de manera que sea modular, escalable y mantenible.
+	\item Documentar el uso de Alembic como herramienta de migración iterativa durante 
+	el desarrollo, describiendo los ajustes realizados al esquema de base de datos 
+	conforme evolucionaron los requerimientos del sistema.
 	
-	\item Implementar el backend del módulo de usuarios usando Litestar para exponer API RESTful, SQLAlchemy y Alembic para el acceso a datos, y librerías modernas para autenticación como \texttt{pwdlib}.
+	\item Implementar el módulo de Usuarios con sus métodos personalizados de creación 
+	y actualización vinculados a roles, y con guards de acceso que diferencien usuarios 
+	activos de administradores.
 	
-	\item Diseñar e implementar el frontend del módulo de usuarios usando Vue 3 y su ecosistema (Composition API, Pinia, Vue Router, PrimeVue, Vite y TailwindCSS). Adicionalmente, se debe explicar cómo cada herramienta contribuye a la modularidad, al mantenimiento y a la experiencia de usuario.
+	\item Implementar el módulo de Autenticación, centralizando la emisión y validación de tokens 
+	JWT para todas las rutas protegidas del sistema.
 	
-	\item Establecer la comunicación entre frontend y backend mediante interfaces tipadas (TypeScript) y buenas prácticas de consumo de API.
+	\item Implementar el módulo de Catálogo para las 
+	entidades de referencia del sistema: \texttt{roles}, \texttt{brands}, 
+	\texttt{models}, \texttt{categories}, \texttt{statuses} y \texttt{ubications}.
 	
-	\item Dejar una base preparada para la implementación de los módulos de productos y préstamos, estableciendo criterios de escalabilidad que se profundizarán en el Hito 4.
+	\item Implementar el módulo de Productos con sus campos de relación opcionales como \texttt{brand\_id}, 
+	\texttt{model\_id} y \texttt{category\_id}.
+	
+	\item Implementar el módulo de Dispositivos con métodos personalizados de consulta, 
+	filtrado y cambio de estado, incorporando un registro automático de historial.
+	
+	\item Implementar el módulo de Préstamos con el flujo completo de ciclo de vida 
+	de una solicitud: creación, aprobación o rechazo, entrega y devolución, 
+	actualizando los estados de los dispositivos involucrados.
 \end{itemize}

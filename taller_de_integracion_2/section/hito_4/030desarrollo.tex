@@ -16,7 +16,8 @@ final: el acceso a la aplicación y la navegación según el rol asignado.
 Se definen dos layouts que encapsulan la estructura visual de las rutas de la 
 aplicación. \texttt{AuthLayout} es el layout público, utilizado exclusivamente por 
 \texttt{/login}; centra el contenido sobre un fondo degradado oscuro y no incluye 
-ningún elemento de navegación. \texttt{AppLayout} es el layout principal para todas 
+ningún elemento de navegación, como se aprecia en la figura~\ref{fig:01_auth_layout}.
+\texttt{AppLayout} es el layout principal para todas 
 las rutas privadas; integra \texttt{AppSidebar} y \texttt{AppTopbar} como componentes 
 de navegación persistentes, mientras que el contenido de cada ruta se renderiza 
 dentro de \texttt{<RouterView />}. La separación entre ambos layouts permite que la 
@@ -31,7 +32,9 @@ exitosa, el token JWT se persiste en \texttt{localStorage} a través de
 \texttt{useAuthStore}, y los datos del usuario autenticado se cargan inmediatamente 
 mediante \texttt{getMyUser()} y se almacenan en \texttt{useUserStore}. Si el usuario 
 provino de una ruta protegida, el router lo redirige al destino original; en caso 
-contrario, a \texttt{HomeView}. Los errores de credenciales (\texttt{401}) y de 
+contrario, a \texttt{HomeView}, cuya vista se puede apreciar en las 
+figuras~\ref{fig:02_homeview_admin} y~\ref{fig:03_homeview_user}.
+Los errores de credenciales (\texttt{401}) y de 
 cuenta inactiva (\texttt{403}) se muestran como mensajes descriptivos en la misma 
 vista, sin requerir componentes externos.
 
@@ -45,16 +48,19 @@ autenticación y \texttt{useUserStore} para verificar el rol de administrador,
 redirigiendo al login o al home según corresponda. Esto garantiza que un usuario con 
 \texttt{is\_admin = false} solo pueda acceder a \texttt{HomeView}, 
 \texttt{DeviceCatalogView}, \texttt{MyLoansView} y \texttt{MyUserView}.
+Dentro de las figuras~\ref{fig:02_homeview_admin} y~\ref{fig:03_homeview_user} 
+se aprecia el control de acceso diferenciado para cada tipo de usuario.
 
 \subsubsection*{Vistas de usuario}
 
 \texttt{UsersListView} es la vista de administración de usuarios, accesible solo bajo 
 \texttt{/admin/users}; permite listar, crear, editar y eliminar usuarios, y gestionar 
-sus roles mediante el repositorio de \texttt{roles}. \texttt{MyUserView} expone los 
+sus roles mediante el repositorio de \texttt{roles}, como se aprecia en la 
+figura~\ref{fig:04_users_list_view}.
+\texttt{MyUserView} expone los 
 datos del usuario autenticado obtenidos desde \texttt{GET /users/me}, permitiendo 
-consultar su perfil sin necesidad de conocer su identificador numérico. 
-\texttt{AdminRolesView} es la vista de administración de roles, accesible en 
-\texttt{/admin/roles}.
+consultar su perfil sin necesidad de conocer su identificador numérico, como se 
+aprecia en la figura~\ref{fig:05_my_user_view}.
 
 % -------------------------------------------------------
 \subsection{Fase 2: Módulo de Catálogo}
@@ -64,12 +70,17 @@ administradores.
 
 \texttt{CatalogView}, disponible en \texttt{/admin/catalog}, agrupa en una sola 
 vista la administración de \texttt{brands}, \texttt{models}, \texttt{categories}, 
-\texttt{statuses} y \texttt{ubications}. Cada entidad se presenta en una sección 
+\texttt{statuses} y \texttt{ubications}, algunas de cuyas secciones se pueden 
+apreciar en las figuras~\ref{fig:06_catalog_roles}, \ref{fig:07_catalog_ubicaciones}, 
+\ref{fig:08_catalog_estados} y~\ref{fig:09_catalog_modelos}.
+Cada entidad se presenta en una sección 
 con su propia tabla y formulario de creación y edición. Las operaciones disponibles 
 son listado, creación, edición y eliminación, todas consumiendo los endpoints del 
 módulo de catálogo del backend.
 
-Una consideración importante respecto a \texttt{statuses}: los estados del sistema 
+Una consideración importante respecto a \texttt{statuses}
+(ver figura~\ref{fig:08_catalog_estados}):
+los estados del sistema 
 son estáticos e imborrables desde la interfaz. Esto se debe a que su uso es único y 
 vital para el funcionamiento del ciclo de vida de los préstamos y del historial de 
 dispositivos: nombres como \texttt{`disponible'}, \texttt{`pendiente'}, 
@@ -90,6 +101,9 @@ administrador crear, editar y eliminar productos. Cada producto puede vincularse
 opcionalmente a entidades del catálogo: marca, modelo y categoría. 
 \texttt{ProductDetailView}, accesible en \texttt{/admin/products/:id}, expone el 
 detalle completo de un producto junto con los dispositivos asociados a él.
+Las vistas implementadas para \texttt{ProductsListView} se pueden apreciar en las 
+figuras~\ref{fig:10_products_list_admin}, \ref{fig:11_products_list_nuevo} 
+y~\ref{fig:12_products_list_detalles}.
 
 Es a partir de esta fase donde comienza a evidenciarse en el frontend la necesidad 
 de las eliminaciones en cascada en la base de datos. Al implementar la eliminación 
@@ -111,19 +125,27 @@ disponibles.
 \texttt{DevicesListView}, accesible en \texttt{/admin/devices}, permite al 
 administrador registrar nuevos dispositivos, editarlos, cambiar su estado y 
 eliminarlos. Cada dispositivo se vincula a un producto y, opcionalmente, a una 
-ubicación del catálogo. Al igual que en la fase anterior, la eliminación de un 
+ubicación del catálogo, como se aprecia en las 
+figuras~\ref{fig:13_devices_list_view} y~\ref{fig:14_devices_list_agregar}.
+Al igual que en la fase anterior, la eliminación de un 
 dispositivo requirió la corrección de la relación \texttt{ON DELETE CASCADE} entre 
 \texttt{loan\_request\_items} y \texttt{devices}, también gestionada con Alembic 
-según lo descrito en \ref{sec:alembic_uso}.
+según lo descrito en la sección~\ref{sec:alembic_uso}.
+Adicionalmente, la figura~\ref{fig:15_products_filtro_devices} ilustra la integración 
+de un botón dentro de \texttt{ProductsListView} que permite agregar dispositivos 
+directamente desde la vista, realizando un envío hacia \texttt{DevicesListView} con 
+el filtro del producto seleccionado aplicado.
 
 \texttt{DeviceCatalogView}, accesible en \texttt{/catalog} para todos los usuarios 
 autenticados, es la vista principal de interacción para el usuario común. Muestra 
 únicamente los dispositivos con estado \texttt{"disponible"}, consumiendo el endpoint 
 \texttt{GET /devices/available}. La vista incluye filtros por categoría y búsqueda 
 por texto, y permite seleccionar uno o más dispositivos mediante casillas de 
-verificación. Al confirmar la selección, se abre un diálogo donde el usuario puede 
+verificación, como se aprecia en la figura~\ref{fig:16_device_catalog_view}.
+Al confirmar la selección, se abre un diálogo donde el usuario puede 
 ingresar un motivo y una fecha estimada de devolución, dejando todo listo para enviar 
-la solicitud de préstamo. La lógica de creación del préstamo, sin embargo, no se 
+la solicitud de préstamo, como se muestra en la figura~\ref{fig:17_device_catalog_prestamo}.
+La lógica de creación del préstamo, sin embargo, no se 
 activa en esta fase: los formularios y la selección quedan preparados para ser 
 conectados al módulo de préstamos en la fase siguiente. Adicionalmente, la vista 
 verifica solicitudes activas del usuario antes de abrir el diálogo, evitando 
@@ -196,12 +218,16 @@ abre un \texttt{Drawer} lateral con el detalle completo: datos del solicitante,
 fechas del ciclo, dispositivos involucrados y un timeline visual del ciclo de vida. 
 Desde este mismo drawer el administrador puede ejecutar las acciones disponibles 
 según el estado actual: aprobar o rechazar si está pendiente, registrar entrega si 
-está aprobada, y registrar devolución si está prestada.
+está aprobada, y registrar devolución si está prestada. Las vistas de 
+\texttt{AdminLoansView} se aprecian en las 
+figuras~\ref{fig:18_admin_loans_view}, \ref{fig:19_admin_loans_ciclo_inicial} 
+y~\ref{fig:20_admin_loans_ciclo_finalizado}.
 
 \texttt{MyLoansView}, accesible en \texttt{/my-loans} para todos los usuarios 
 autenticados, muestra las solicitudes propias del usuario con el mismo componente de 
 timeline, permitiendo hacer seguimiento del estado de cada préstamo sin necesidad de 
-contactar al administrador.
+contactar al administrador, como se aprecia en las 
+figuras~\ref{fig:21_my_loans_view} y~\ref{fig:22_my_loans_detalles}.
 
 % -------------------------------------------------------
 \subsection{Fase 6: UX, UI y evidencias}
@@ -211,7 +237,7 @@ contactar al administrador.
 Una vez implementadas todas las funcionalidades del sistema, se realizó una revisión 
 iterativa de la experiencia de usuario desde la perspectiva del desarrollador como 
 usuario de prueba. Este proceso consistió en recorrer todos los flujos de la 
-aplicación —tanto desde el rol de usuario común como desde el rol de administrador— 
+aplicación, tanto desde el rol de usuario común como desde el rol de administrador, 
 con el objetivo de identificar inconsistencias visuales, comportamientos inesperados 
 y oportunidades de mejora que no son evidentes durante la implementación técnica.
 
@@ -225,14 +251,157 @@ solicitudes duplicadas) para dar retroalimentación inmediata al usuario sin
 interrumpir el flujo de navegación; y validaciones visuales en formularios para 
 prevenir el envío de datos incompletos o inválidos.
 
+Adicionalmente, \texttt{HomeView} fue enriquecida con métricas simples que ofrecen 
+al usuario una visión inmediata del estado del sistema al iniciar sesión. Según el 
+rol del usuario autenticado, la vista muestra tarjetas de resumen con información 
+relevante —como el número de dispositivos disponibles, solicitudes activas o 
+préstamos pendientes de gestión— cada una con acceso directo a su vista 
+correspondiente. Esto reduce la necesidad de navegar manualmente por el menú para 
+obtener un panorama general, mejorando la eficiencia del flujo de trabajo tanto para 
+administradores como para usuarios comunes, como se aprecia en las 
+figuras~\ref{fig:02_homeview_admin} y~\ref{fig:03_homeview_user}.
+
 La adaptación \textit{responsive} se verificó probando la aplicación en distintos 
-tamaños de ventana, en orientación horizontal y vertical, y en diferentes navegadores. 
-El layout basado en \texttt{AppSidebar} colapsable y el uso de componentes de PrimeVue 
-con soporte nativo para pantallas pequeñas permitió que la interfaz se adapte de forma 
-satisfactoria tanto a resoluciones de escritorio como a dispositivos móviles en 
-orientación vertical.
+tamaños de ventana, en orientación horizontal y vertical, y en diferentes navegadores 
+(Firefox, Chrome y Edge). El layout basado en \texttt{AppSidebar} colapsable y el 
+uso de componentes de PrimeVue con soporte nativo para pantallas pequeñas permitió 
+que la interfaz se adapte de forma satisfactoria tanto a resoluciones de escritorio 
+como a resolución adaptada a dispositivos móviles con el modo de orientación vertical 
+en los navegadores de escritorio.
 
 \subsubsection*{Evidencias de la implementación}
 
 % [Sección reservada para capturas de pantalla y evidencias visuales de la 
 %  implementación del frontend.]
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/01_auth_layout.png}
+	\caption{Vista de autenticación — pantalla de inicio de sesión}
+	\label{fig:01_auth_layout}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/02_homeView_admin_UX_UI.png}
+	\caption{Vista de inicio para el rol administrador}
+	\label{fig:02_homeview_admin}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/03_homeView_user_UX_UI.png}
+	\caption{Vista de inicio para el rol usuario}
+	\label{fig:03_homeview_user}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/04_UserListView.png}
+	\caption{Vista de administración de usuarios}
+	\label{fig:04_users_list_view}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/05_MyUserView.png}
+	\caption{Vista de perfil del usuario autenticado}
+	\label{fig:05_my_user_view}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/06_CatalogView_roles.png}
+	\caption{Vista de catálogo — sección de roles}
+	\label{fig:06_catalog_roles}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/07_CatalogView_ubicaciones.png}
+	\caption{Vista de catálogo — sección de ubicaciones}
+	\label{fig:07_catalog_ubicaciones}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/08_CatalogView_estados.png}
+	\caption{Vista de catálogo — sección de estados}
+	\label{fig:08_catalog_estados}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/09_CatalogView_modelos.png}
+	\caption{Vista de catálogo — sección de modelos}
+	\label{fig:09_catalog_modelos}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/10_ProductsListView_admin.png}
+	\caption{Vista de administración de productos}
+	\label{fig:10_products_list_admin}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/11_ProductsListView_admin_nuevo_producto.png}
+	\caption{Vista de administración de productos — formulario de nuevo producto}
+	\label{fig:11_products_list_nuevo}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/12_ProductsListView_admin_detalles.png}
+	\caption{Vista de administración de productos — detalle de producto}
+	\label{fig:12_products_list_detalles}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/13_DevicesListView.png}
+	\caption{Vista de administración de dispositivos}
+	\label{fig:13_devices_list_view}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/14_DevicesListView_agregar.png}
+	\caption{Vista de administración de dispositivos — formulario de nuevo dispositivo}
+	\label{fig:14_devices_list_agregar}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/15_ProductsListView_filtro_DevicesListView.png}
+	\caption{Vista de dispositivos filtrada desde detalle de producto}
+	\label{fig:15_products_filtro_devices}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/16_DeviceCatalogView.png}
+	\caption{Vista de catálogo de dispositivos disponibles para usuarios}
+	\label{fig:16_device_catalog_view}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/17_DeviceCatalogView_prestamo.png}
+	\caption{Vista de catálogo de dispositivos — formulario de solicitud de préstamo}
+	\label{fig:17_device_catalog_prestamo}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/18_AdminLoansView.png}
+	\caption{Vista de administración de solicitudes de préstamo}
+	\label{fig:18_admin_loans_view}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/19_AdminLoansView_ciclo_inicial.png}
+	\caption{Vista de administración de préstamos — ciclo de vida en estado inicial}
+	\label{fig:19_admin_loans_ciclo_inicial}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/20_AdminLoansView_ciclo_finalizado.png}
+	\caption{Vista de administración de préstamos — ciclo de vida finalizado}
+	\label{fig:20_admin_loans_ciclo_finalizado}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/21_MyLoansView.png}
+	\caption{Vista de solicitudes del usuario autenticado}
+	\label{fig:21_my_loans_view}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/22_MyLoansView_detalles.png}
+	\caption{Vista de solicitudes del usuario autenticado — detalle de solicitud}
+	\label{fig:22_my_loans_detalles}
+\end{figure}

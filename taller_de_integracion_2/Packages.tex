@@ -30,6 +30,12 @@
 
 \usepackage{pdfpages}   % Insertar pdf
 
+% Para texttt
+\usepackage{seqsplit}
+\newcommand{\ttt}[1]{\texttt{\seqsplit{#1}}}	% Respetar saltos de linea.
+% Ejemplo de uso: \ttt{loan\_request\_items.device.loan\_request\_items}
+
+
 
 % Tikz
 \usepackage{tikz}

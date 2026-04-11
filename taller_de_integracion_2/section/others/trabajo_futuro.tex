@@ -1,11 +1,13 @@
-\section{Mejoras al proyecto actual}\label{sec:mejorar_proyecto_actual}
+\section{Trabajo futuro}\label{sec:trabajo_futuro}
+
+\subsection{Mejoras al proyecto actual}\label{sec:mejorar_proyecto_actual}
 
 Las siguientes mejoras corresponden a funcionalidades identificadas durante el 
 desarrollo que quedaron fuera del alcance de la titulación. Se recomienda abordarlas 
 como primera etapa de cualquier proyecto de continuación, ya que complementan 
 directamente el módulo de préstamos ya implementado.
 
-\subsection{Seguridad y autenticación}
+\subsubsection{Seguridad y autenticación}
 
 \subsubsection*{Refresh Tokens}
 
@@ -23,7 +25,7 @@ administrador. Una mejora sería vincularlo a reglas automáticas, como desactiv
 cuentas que no han tenido actividad durante un período definido, o asignar fecha de 
 vencimiento a cuentas temporales de alumnos de semestres específicos.
 
-\subsection{Módulo de Préstamos}
+\subsubsection{Módulo de Préstamos}
 
 \subsubsection*{Cancelación de solicitudes por el usuario}
 
@@ -46,7 +48,7 @@ se serializa correctamente desde el DTO del backend. Actualmente se resuelve con
 llamadas adicionales desde el frontend. Se propone resolver este problema a nivel del 
 \texttt{LoanRequestReadDTO} para eliminar las llamadas redundantes.
 
-\subsection{Módulo de Dispositivos}
+\subsubsection{Módulo de Dispositivos}
 
 \subsubsection*{\texttt{DeviceForm} reutilizable}
 
@@ -62,7 +64,7 @@ abrir el Drawer de edición directamente. El botón ``Agregar dispositivo'' mues
 mensaje de próximamente en lugar de abrir un formulario. Ambos deben ser 
 implementados correctamente.
 
-\subsection{Módulo de Usuarios}
+\subsubsection{Módulo de Usuarios}
 
 \subsubsection*{Drawer para ver detalles de usuario}
 
@@ -82,20 +84,20 @@ secciones podrían almacenarse como un campo JSON en el modelo \texttt{User} del
 backend para mayor flexibilidad.
 
 % -------------------------------------------------------
-\section{Nuevos módulos propuestos}
+\subsection{Nuevos módulos propuestos}
 
 Los siguientes módulos representan extensiones naturales de la plataforma hacia otras 
 necesidades del LabDIC. Cada uno puede desarrollarse de forma independiente como 
 proyecto de titulación, conectándose a la infraestructura existente.
 
-\subsection{Módulo 1 --- Préstamo de Inventario (continuación)}
+\subsubsection{Módulo 1 --- Préstamo de Inventario (continuación)}
 
 Corresponde a la consolidación de todas las mejoras pendientes descritas en la 
 sección \ref{sec:mejorar_proyecto_actual}. Incluye la resolución de los problemas técnicos identificados, la 
 implementación de las funcionalidades que quedaron fuera del alcance y la 
 incorporación de mejoras de UX identificadas durante el desarrollo.
 
-\subsubsection*{Alcance sugerido}
+\subsubsection*{Posible alcance}
 
 \begin{itemize}
 	\item Todas las mejoras de la sección anterior de este documento.
@@ -106,14 +108,14 @@ incorporación de mejoras de UX identificadas durante el desarrollo.
 	\item Optimización de DTOs del backend para eliminar llamadas redundantes.
 \end{itemize}
 
-\subsection{Módulo 2 --- Administración de Inventario}
+\subsubsection{Módulo 2 --- Administración de Inventario}
 
 Módulo orientado a tareas administrativas del laboratorio que van más allá de los 
 préstamos. Toma como base el modelo de datos ya desarrollado (productos, dispositivos, 
 ubicaciones) y agrega herramientas de gestión documental y reportería para los 
 administradores del LabDIC.
 
-\subsubsection*{Alcance sugerido}
+\subsubsection*{Posible alcance}
 
 \begin{itemize}
 	\item Dashboard administrativo con estadísticas del inventario: dispositivos por 
@@ -128,7 +130,7 @@ administradores del LabDIC.
 	\item Gestión de proveedores y registro de adquisiciones de equipos.
 \end{itemize}
 
-\subsection{Módulo 3 --- Gestión de DHCP}
+\subsubsection{Módulo 3 --- Gestión de DHCP}
 
 Los administradores del LabDIC gestionan manualmente el archivo de configuración DHCP 
 para controlar qué dispositivos externos pueden conectarse a la red WiFi del 
@@ -143,7 +145,7 @@ identificados por su dirección MAC. Las direcciones están organizadas en rango
 según el tipo de dispositivo y la sala a la que pertenecen: dispositivos inalámbricos 
 temporales de estudiantes, equipos fijos de salas TI-1, TI-2, Redes, entre otros.
 
-\subsubsection*{Alcance sugerido}
+\subsubsection*{Posible alcance}
 
 \begin{itemize}
 	\item Interfaz web para agregar, editar y eliminar registros DHCP sin editar el 
@@ -167,7 +169,7 @@ infraestructura de red del laboratorio. Se recomienda como proyecto de titulaci�
 independiente con participación del equipo de administración de redes del 
 departamento.
 
-\subsection{Módulo 4 --- Administración de Salas}
+\subsubsection{Módulo 4 --- Administración de Salas}
 
 Módulo de gestión de horarios y reservas de las salas de clases del LabDIC. Permite 
 a los profesores solicitar salas, visualizar disponibilidad en formato calendario y 
@@ -181,7 +183,7 @@ otras. La coordinación de horarios y asignación de salas actualmente se realiz
 forma manual, lo que puede generar conflictos y falta de visibilidad para los 
 profesores.
 
-\subsubsection*{Alcance sugerido}
+\subsubsection*{Posible alcance}
 
 \begin{itemize}
 	\item Vista de calendario por sala con columnas por día de la semana (lunes a 
@@ -208,7 +210,7 @@ independiente con participación directa de los profesores del departamento como
 usuarios de prueba.
 
 % -------------------------------------------------------
-\section{Resumen y recomendaciones}
+\subsection{Resumen y recomendaciones}
 
 La tabla~\ref{tab:trabajo_futuro_resumen} resume los cuatro módulos propuestos con su 
 clasificación de complejidad y el tipo de proyecto que mejor se adapta a cada uno.

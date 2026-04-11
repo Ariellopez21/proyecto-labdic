@@ -1,4 +1,4 @@
-\section{Desarrollo}
+\section{Implementación de base de datos y backend del sistema}
 
 \subsection{Uso de Alembic a lo largo del desarrollo}\label{sec:alembic_uso}
 
@@ -175,8 +175,8 @@ modelo ORM, sin una exclusión explícita el serializador intentaría seguir las
 en ambas direcciones indefinidamente: desde \texttt{LoanRequest} hacia \texttt{Device}, 
 y desde \texttt{Device} de vuelta hacia \texttt{LoanRequest} a través de 
 \texttt{loan\_request\_items}, generando un ciclo infinito que termina en error. Por 
-ello, el DTO excluye explícitamente campos como \texttt{loan\_request\_items.loan\_request}, 
-\texttt{loan\_request\_items.device.loan\_request\_items} y otros que cierran el ciclo, 
+ello, el DTO excluye explícitamente campos como \ttt{loan\_request\_items.loan\_request}, 
+\ttt{loan\_request\_items.device.loan\_request\_items} y otros que cierran el ciclo, 
 además de ocultar datos sensibles como \texttt{user.password}.
 
 \texttt{LoanRequestCreateDTO}, en cambio, se implementa como un \texttt{dataclass} en 

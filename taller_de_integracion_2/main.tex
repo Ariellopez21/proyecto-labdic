@@ -3,42 +3,40 @@
 \onehalfspacing % interlineado 1.5
 
 \begin{document}
-    \input{Portada}
-    %\input{Portada_Anexo_B}    % No es importante.
-    \pagestyle{mystyle} % Encabezado personalizado
-
-% ----------- INDICE -------------
-    \tableofcontents
-    \listoffigures
-    %\lstlistoflistings
-    %\listofalgorithms
-    \listoftables
-
-    \newpage
-    
-% ----------- SECCIONES -------------
-
-    % HITO 1: Planificación, motivación y marco teórico
-    \input{section/hito_1/000hito_1}
-    % HITO 2: Diseño del modelo de base de datos
-    \input{section/hito_2/000hito_2}
-    % HITO 3: Implementación de base de datos y backend del sistema
-    \input{section/hito_3/000hito_3}
-    % HITO 4: Implementación del frontend del sistema
-    \input{section/hito_4/000hito_4}
-    % HITO 5: Arquitectura del sistema completo
-	\input{section/hito_5/000hito_5}
-    % Otras implementaciones del informe completo
-    \input{section/others/trabajo_futuro}
-
-% ----------- BIBLIOGRAFIA -------------
-    \printbibliography[
-    title={Bibliografía},
-    heading=bibintoc]
-    
-% ----------- ANEXOS -------------
-
-    %\input{anexo/200AnexoB}    No es importante.
-    %\input{anexo/210AnexoB_details}    No es importante.
-
+	\input{Portada}
+	%\input{Portada_Anexo_B}    % No es importante.
+	\pagestyle{mystyle} % Encabezado personalizado
+	
+	% ----------- INDICE -------------
+	\tableofcontents
+	\listoffigures
+	%\lstlistoflistings
+	%\listofalgorithms
+	\listoftables
+	
+	\newpage
+	
+	% ----------- SECCIONES -------------
+	
+	% Introducción unificada
+	\input{section/informe_final/010intro}
+	
+	% Objetivos unificados
+	\input{section/informe_final/020objetivo}
+	
+	% Desarrollo (incluye hitos 1, 2, 5, 3, 4 y trabajo futuro)
+	\input{section/informe_final/030desarrollo}
+	
+	% Conclusión unificada
+	\input{section/informe_final/040conclusiones}
+	
+	% ----------- BIBLIOGRAFIA -------------
+	\printbibliography[
+	title={Bibliografía},
+	heading=bibintoc]
+	
+	% ----------- ANEXOS -------------
+	
+	\input{anexos/050anexos}
+	
 \end{document}

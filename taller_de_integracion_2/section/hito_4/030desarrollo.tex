@@ -1,4 +1,4 @@
-\section{Desarrollo}
+\section{Implementación del frontend del sistema}
 
 El desarrollo del frontend se organizó en seis fases progresivas, donde cada una 
 deja las condiciones preparadas para que la siguiente pueda avanzar sin fricciones. 
@@ -6,7 +6,7 @@ Esta estrategia permitió mantener en todo momento una aplicación funcional y
 coherente, evitando estados intermedios rotos o incompletos.
 
 % -------------------------------------------------------
-\subsection{Fase 1: Módulo de Usuarios y Autenticación}
+\subsection{Fase 1: Módulo de Usuarios y Autenticación}\label{sec:hito4_frontend_fase_1}
 
 La primera fase establece las bases del sistema desde la perspectiva del usuario 
 final: el acceso a la aplicación y la navegación según el rol asignado.
@@ -230,7 +230,7 @@ contactar al administrador, como se aprecia en las
 figuras~\ref{fig:21_my_loans_view} y~\ref{fig:22_my_loans_detalles}.
 
 % -------------------------------------------------------
-\subsection{Fase 6: UX, UI y evidencias}
+\subsection{Fase 6: UX, UI}\label{sec:hito4_frontend_fase_6}
 
 \subsubsection*{Revisión de experiencia de usuario}
 
@@ -271,137 +271,10 @@ en los navegadores de escritorio.
 
 \subsubsection*{Evidencias de la implementación}
 
-% [Sección reservada para capturas de pantalla y evidencias visuales de la 
-%  implementación del frontend.]
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/01_auth_layout.png}
-	\caption{Vista de autenticación — pantalla de inicio de sesión}
-	\label{fig:01_auth_layout}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/02_homeView_admin_UX_UI.png}
-	\caption{Vista de inicio para el rol administrador}
-	\label{fig:02_homeview_admin}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/03_homeView_user_UX_UI.png}
-	\caption{Vista de inicio para el rol usuario}
-	\label{fig:03_homeview_user}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/04_UserListView.png}
-	\caption{Vista de administración de usuarios}
-	\label{fig:04_users_list_view}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/05_MyUserView.png}
-	\caption{Vista de perfil del usuario autenticado}
-	\label{fig:05_my_user_view}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/06_CatalogView_roles.png}
-	\caption{Vista de catálogo — sección de roles}
-	\label{fig:06_catalog_roles}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/07_CatalogView_ubicaciones.png}
-	\caption{Vista de catálogo — sección de ubicaciones}
-	\label{fig:07_catalog_ubicaciones}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/08_CatalogView_estados.png}
-	\caption{Vista de catálogo — sección de estados}
-	\label{fig:08_catalog_estados}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/09_CatalogView_modelos.png}
-	\caption{Vista de catálogo — sección de modelos}
-	\label{fig:09_catalog_modelos}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/10_ProductsListView_admin.png}
-	\caption{Vista de administración de productos}
-	\label{fig:10_products_list_admin}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/11_ProductsListView_admin_nuevo_producto.png}
-	\caption{Vista de administración de productos — formulario de nuevo producto}
-	\label{fig:11_products_list_nuevo}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/12_ProductsListView_admin_detalles.png}
-	\caption{Vista de administración de productos — detalle de producto}
-	\label{fig:12_products_list_detalles}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/13_DevicesListView.png}
-	\caption{Vista de administración de dispositivos}
-	\label{fig:13_devices_list_view}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/14_DevicesListView_agregar.png}
-	\caption{Vista de administración de dispositivos — formulario de nuevo dispositivo}
-	\label{fig:14_devices_list_agregar}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/15_ProductsListView_filtro_DevicesListView.png}
-	\caption{Vista de dispositivos filtrada desde detalle de producto}
-	\label{fig:15_products_filtro_devices}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/16_DeviceCatalogView.png}
-	\caption{Vista de catálogo de dispositivos disponibles para usuarios}
-	\label{fig:16_device_catalog_view}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/17_DeviceCatalogView_prestamo.png}
-	\caption{Vista de catálogo de dispositivos — formulario de solicitud de préstamo}
-	\label{fig:17_device_catalog_prestamo}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/18_AdminLoansView.png}
-	\caption{Vista de administración de solicitudes de préstamo}
-	\label{fig:18_admin_loans_view}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/19_AdminLoansView_ciclo_inicial.png}
-	\caption{Vista de administración de préstamos — ciclo de vida en estado inicial}
-	\label{fig:19_admin_loans_ciclo_inicial}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/20_AdminLoansView_ciclo_finalizado.png}
-	\caption{Vista de administración de préstamos — ciclo de vida finalizado}
-	\label{fig:20_admin_loans_ciclo_finalizado}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/21_MyLoansView.png}
-	\caption{Vista de solicitudes del usuario autenticado}
-	\label{fig:21_my_loans_view}
-\end{figure}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\textwidth]{img/22_MyLoansView_detalles.png}
-	\caption{Vista de solicitudes del usuario autenticado — detalle de solicitud}
-	\label{fig:22_my_loans_detalles}
-\end{figure}
+Las evidencias visuales de las 6 fases de desarrollo e implementación del frontend 
+se encuentran consolidadas en el anexo~\ref{sec:anexo_evidencias}, donde se 
+presentan todas las pantallas y vistas funcionando tal como se describen en las 
+secciones~\ref{sec:hito4_frontend_fase_1} a~\ref{sec:hito4_frontend_fase_6}.
+Con esto concluye la implementación del sistema, el cual, al ser modular y 
+escalable, abre paso a mejoras y extensiones futuras descritas en la 
+sección~\ref{sec:trabajo_futuro}.

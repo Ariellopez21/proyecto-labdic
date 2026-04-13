@@ -1,63 +1,119 @@
-# LabDIC Inventory
+# LabDIC — Plataforma de Gestión de Inventario
 
-Una aplicación con backend y frontend dedicado a la administración del Laboratorio del Departamento de Ingeniería en Computación de la Universidad de Magallanes (LabDIC-UMAG).
+Plataforma web para la gestión de inventario y préstamos del Laboratorio de Computación (LabDIC). Desarrollada como proyecto de titulación de Ingeniería en Computación e informática.
 
-## Tech Stack
+---
 
-**Frontend:** Vue 3, TypeScript, PrimeVue, Tailwind CSS, Pinia, Vite  
-**Backend:** Python 3.13, Litestar, SQLAlchemy, PostgreSQL, PWDLIB, pydantic, Alembic
+## Tecnologías
 
-## Quick Start
+| Componente      | Tecnología                | Versión |
+|-----------------|---------------------------|---------|
+| Base de datos   | PostgreSQL                | 16      |
+| ORM / Migraciones | SQLAlchemy + Alembic    | —       |
+| Backend         | Python + Litestar         | 3.13    |
+| Gestor backend  | uv                        | 0.6     |
+| Frontend        | Vue 3 + TypeScript + Vite | —       |
+| UI              | PrimeVue + TailwindCSS    | —       |
+| Gestor frontend | Bun                       | 1.2     |
 
-**Prerequisites:** Bun 1.2+, uv
+---
 
-### Backend Run
+## Estructura del proyecto
 
-```bash
-cd app-backend
-source .venv/bin/activate
-uv sync
-uv run alembic upgrade head
-litestar run --reload # Starts on http://localhost:8000
+```
+proyecto-labdic/
+├── app-backend/
+│   ├── app/
+│   ├── alembic/
+│   ├── alembic.ini
+│   ├── pyproject.toml
+│   ├── uv.lock
+│   ├── seed.py
+│   └── .env
+└── app-frontend/
+    ├── src/
+    └── .env
 ```
 
-### Frontend Run
+---
 
-```bash
-cd app-frontend
-bun i
-bun run dev  # Starts on http://localhost:5173
-```
+## Requisitos previos
 
-## Configuration
+- **PostgreSQL 16** instalado y corriendo localmente.
+- **Python 3.13** instalado.
+- **uv 0.6** instalado ([instrucciones](https://docs.astral.sh/uv/getting-started/installation/)).
+- **Bun 1.2** instalado ([instrucciones](https://bun.sh/docs/installation)).
 
-**Backend** (`.env` in `app-backend/`):
+---
 
+## Variables de entorno
+
+Antes de levantar los servicios, revisar y ajustar los archivos `.env` de cada servicio.
+
+**`app-backend/.env`**
 ```env
 DATABASE_URL=postgresql+psycopg2:///labdic_inventory
 CORS_ALLOWED_ORIGINS=["http://localhost:5173"]
 ```
 
-**Frontend** (`.env` in `app-frontend/`):
-
+**`app-frontend/.env`**
 ```env
 VITE_API_URL=http://localhost:8000
 ```
 
-## API
+---
 
-- **Users:** `/labdic_inventory/users` (GET, POST, PATCH, DELETE)
-- **Auth** `/labdic_inventory/auth` (POST)
-- **Role:** `/labdic_inventory/roles` (GET, POST, PATCH, DELETE)
-- **Brand:** `/labdic_inventory/brands`
-- **Model:** `/labdic_inventory/models`
-- **Category:** `/labdic_inventory/categories`
-- **Product:** `/labdic_inventory/products`
-- **Status:** `/labdic_inventory/statuses`
-- **Ubication:** `/labdic_inventory/ubications`
-- **Device:** `/labdic_inventory/devices`
-- **LoanRequest:**
-- **LoanRequestItem:**
-- **DeviceStatusLog:**
+## Base de datos
 
-- **Docs:** `http://localhost:8000/schema`
+Crear la base de datos en PostgreSQL antes de levantar el backend:
+
+```bash
+createdb labdic_inventory
+```
+
+> Si usas un usuario o contraseña específicos, ajusta `DATABASE_URL` en `app-backend/.env` con el formato:
+> `postgresql+psycopg2://usuario:contraseña@localhost:5432/labdic_inventory`
+
+---
+
+## Levantar los servicios
+
+### Backend
+
+```bash
+cd app-backend
+uv sync
+uv run alembic upgrade head
+uv run python seed.py
+uv run litestar run --reload
+```
+
+### Frontend
+
+En otra terminal:
+
+```bash
+cd app-frontend
+bun install
+bun run dev
+```
+
+---
+
+## URLs de acceso
+
+| Servicio  | URL                                      |
+|-----------|------------------------------------------|
+| Frontend  | http://localhost:5173                    |
+| Backend   | http://localhost:8000                    |
+| API Docs  | http://localhost:8000/schema/scalar     |
+
+---
+
+## Acceso a la base de datos
+
+Con `pgcli` (o cualquier cliente PostgreSQL):
+
+```bash
+pgcli postgresql://localhost/labdic_inventory
+```

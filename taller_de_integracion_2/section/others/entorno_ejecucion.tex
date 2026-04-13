@@ -1,0 +1,109 @@
+\section{Entorno de ejecución}\label{sec:entorno_ejecucion}
+
+\subsection*{Tecnologías utilizadas}
+
+La plataforma LabDIC está compuesta por dos servicios independientes: un backend desarrollado
+en Python y un frontend desarrollado en TypeScript con Vue~3. La tabla~\ref{tab:tecnologias}
+resume las tecnologías y versiones utilizadas.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lll}
+		\hline
+		\textbf{Componente}        & \textbf{Tecnología}              & \textbf{Versión} \\
+		\hline
+		Base de datos              & PostgreSQL                       & 16               \\
+		ORM / Migraciones          & SQLAlchemy + Alembic             & —                \\
+		Backend                    & Python + Litestar                & 3.13             \\
+		Gestor de entorno backend  & uv                               & 0.6              \\
+		Frontend                   & Vue~3 + TypeScript + Vite        & —                \\
+		Librería de componentes UI & PrimeVue + TailwindCSS           & —                \\
+		Gestor de entorno frontend & Bun                              & 1.2              \\
+		\hline
+	\end{tabular}
+	\caption{Tecnologías y versiones del proyecto LabDIC.}
+	\label{tab:tecnologias}
+\end{table}
+
+\subsection*{Requisitos previos}
+
+Para levantar la plataforma de forma local se requiere tener instalado:
+
+\begin{itemize}
+	\item \textbf{PostgreSQL 16}: motor de base de datos relacional.
+	\item \textbf{Python 3.13}: lenguaje del backend.
+	\item \textbf{uv 0.6}: gestor de entornos y dependencias Python (\url{https://docs.astral.sh/uv/}).
+	\item \textbf{Bun 1.2}: gestor de paquetes y entorno de ejecución para el frontend (\url{https://bun.sh/}).
+\end{itemize}
+
+\subsection*{Variables de entorno}
+
+Cada servicio requiere un archivo \texttt{.env} con su configuración. Los valores indicados
+corresponden al entorno de desarrollo local.
+
+\textbf{Backend} (\texttt{app-backend/.env}):
+
+\begin{lstlisting}
+DATABASE_URL=postgresql+psycopg2:///labdic_inventory
+CORS_ALLOWED_ORIGINS=["http://localhost:5173"]
+\end{lstlisting}
+
+\textbf{Frontend} (\texttt{app-frontend/.env}):
+
+\begin{lstlisting}
+VITE_API_URL=http://localhost:8000
+\end{lstlisting}
+
+\subsection*{Preparación de la base de datos}
+
+Antes de levantar el backend es necesario crear la base de datos en PostgreSQL:
+
+\begin{lstlisting}
+createdb labdic_inventory
+\end{lstlisting}
+
+Si se utiliza un usuario o contraseña específicos, la variable \texttt{DATABASE\_URL} debe
+ajustarse con el siguiente formato:
+
+\begin{lstlisting}
+postgresql+psycopg2://usuario:contrasena@localhost:5432/labdic_inventory
+\end{lstlisting}
+
+\subsection*{Levantar el backend}
+
+Desde el directorio \texttt{app-backend}, ejecutar los siguientes comandos en orden:
+
+\begin{lstlisting}
+cd app-backend
+uv sync                        # Instala dependencias
+uv run alembic upgrade head    # Aplica migraciones a la DB
+uv run python seed.py          # Puebla datos base
+uv run litestar run --reload   # Levanta la API en modo desarrollo
+\end{lstlisting}
+
+\subsection*{Levantar el frontend}
+
+En otra terminal, desde el directorio \texttt{app-frontend}:
+
+\begin{lstlisting}
+cd app-frontend
+bun install      # Instala dependencias
+bun run dev      # Levanta el servidor de desarrollo
+\end{lstlisting}
+
+\subsection*{URLs de acceso}
+
+Una vez levantados ambos servicios, la plataforma queda accesible en las siguientes
+direcciones:
+
+\begin{center}
+	\begin{tabular}{ll}
+		\hline
+		\textbf{Servicio} & \textbf{URL} \\
+		\hline
+		Frontend  & \texttt{http://localhost:5173} \\
+		Backend   & \texttt{http://localhost:8000} \\
+		API Docs  & \texttt{http://localhost:8000/schema/swagger} \\
+		\hline
+	\end{tabular}
+\end{center}

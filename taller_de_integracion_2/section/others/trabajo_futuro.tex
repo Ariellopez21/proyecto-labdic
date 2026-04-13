@@ -7,9 +7,9 @@ desarrollo que quedaron fuera del alcance de la titulación. Se recomienda abord
 como primera etapa de cualquier proyecto de continuación, ya que complementan 
 directamente el módulo de préstamos ya implementado.
 
-\subsubsection{Seguridad y autenticación}
+\subsubsection*{Seguridad y autenticación}
 
-\subsubsection*{Refresh Tokens}
+\emph{Refresh Tokens}
 
 La implementación actual obliga al usuario a volver a iniciar sesión cada vez que el 
 token JWT expira. Se propone implementar un mecanismo de refresh tokens que renueve 
@@ -18,22 +18,22 @@ configurar Litestar para emitir refresh tokens junto al access token, y modifica
 interceptor de \texttt{apiFetch} en el frontend para intentar el refresco automático 
 ante un error \texttt{401} antes de redirigir al login.
 
-\subsubsection*{Expiración automática de cuentas}
+\emph{Expiración automática de cuentas}
 
 El campo \texttt{is\_active} actualmente es controlado de forma manual por el 
 administrador. Una mejora sería vincularlo a reglas automáticas, como desactivar 
 cuentas que no han tenido actividad durante un período definido, o asignar fecha de 
 vencimiento a cuentas temporales de alumnos de semestres específicos.
 
-\subsubsection{Módulo de Préstamos}
+\subsubsection*{Módulo de Préstamos}
 
-\subsubsection*{Cancelación de solicitudes por el usuario}
+\emph{Cancelación de solicitudes por el usuario}
 
 Actualmente el usuario no puede cancelar una solicitud una vez enviada. Se propone 
 permitir la cancelación mientras la solicitud esté en estado \texttt{"pendiente"}, 
 antes de que el administrador la revise.
 
-\subsubsection*{Catálogo agrupado por producto}
+\emph{Catálogo agrupado por producto}
 
 La vista actual del catálogo muestra una fila por cada dispositivo físico individual, 
 lo que expone códigos internos que no son relevantes para el usuario. Se propone 
@@ -41,39 +41,39 @@ agrupar los dispositivos disponibles por producto, mostrando solo el nombre del
 producto con un contador de unidades disponibles. La asignación del dispositivo 
 físico específico quedaría a criterio del administrador al registrar la entrega.
 
-\subsubsection*{Serialización correcta del DTO de préstamos}
+\emph{Serialización correcta del DTO de préstamos}
 
 La relación \texttt{device.product} dentro de los \texttt{loan\_request\_items} no 
 se serializa correctamente desde el DTO del backend. Actualmente se resuelve con 
 llamadas adicionales desde el frontend. Se propone resolver este problema a nivel del 
 \texttt{LoanRequestReadDTO} para eliminar las llamadas redundantes.
 
-\subsubsection{Módulo de Dispositivos}
+\subsubsection*{Módulo de Dispositivos}
 
-\subsubsection*{\texttt{DeviceForm} reutilizable}
+\emph{\texttt{DeviceForm} reutilizable}
 
 El formulario de creación de dispositivos está embebido en \texttt{DevicesListView}. 
 Se propone extraerlo a un componente independiente \texttt{DeviceForm.vue} para 
 poder reutilizarlo desde \texttt{ProductDetailView} mediante un \texttt{Dialog} con 
 el \texttt{productId} precargado.
 
-\subsubsection*{Botones de \texttt{ProductDetailView}}
+\emph{Botones de \texttt{ProductDetailView}}
 
 El botón ``Editar producto'' actualmente navega a la lista de productos en lugar de 
 abrir el Drawer de edición directamente. El botón ``Agregar dispositivo'' muestra un 
 mensaje de próximamente en lugar de abrir un formulario. Ambos deben ser 
 implementados correctamente.
 
-\subsubsection{Módulo de Usuarios}
+\subsubsection*{Módulo de Usuarios}
 
-\subsubsection*{Drawer para ver detalles de usuario}
+\emph{Drawer para ver detalles de usuario}
 
 El botón ``Ver detalles'' en \texttt{UsersListView} abre un Dialog simple. Se propone 
 reemplazarlo por un Drawer lateral con el mismo diseño que el Drawer de detalle de 
 préstamos, mostrando toda la información del usuario de forma más cómoda y 
 consistente.
 
-\subsubsection*{Perfil personalizable en \texttt{MyUserView}}
+\emph{Perfil personalizable en \texttt{MyUserView}}
 
 Se propone extender la vista de perfil personal con dos funcionalidades: una foto de 
 perfil de tamaño reducido (almacenada como \texttt{base64} o referencia de archivo 
@@ -90,7 +90,7 @@ Los siguientes módulos representan extensiones naturales de la plataforma hacia
 necesidades del LabDIC. Cada uno puede desarrollarse de forma independiente como 
 proyecto de titulación, conectándose a la infraestructura existente.
 
-\subsubsection{Módulo 1 --- Préstamo de Inventario (continuación)}
+\subsubsection{Préstamo de Inventario (continuación)}
 
 Corresponde a la consolidación de todas las mejoras pendientes descritas en la 
 sección \ref{sec:mejorar_proyecto_actual}. Incluye la resolución de los problemas técnicos identificados, la 
@@ -108,7 +108,7 @@ incorporación de mejoras de UX identificadas durante el desarrollo.
 	\item Optimización de DTOs del backend para eliminar llamadas redundantes.
 \end{itemize}
 
-\subsubsection{Módulo 2 --- Administración de Inventario}
+\subsubsection{Administración de Inventario}
 
 Módulo orientado a tareas administrativas del laboratorio que van más allá de los 
 préstamos. Toma como base el modelo de datos ya desarrollado (productos, dispositivos, 
@@ -130,7 +130,7 @@ administradores del LabDIC.
 	\item Gestión de proveedores y registro de adquisiciones de equipos.
 \end{itemize}
 
-\subsubsection{Módulo 3 --- Gestión de DHCP}
+\subsubsection{Gestión de DHCP}
 
 Los administradores del LabDIC gestionan manualmente el archivo de configuración DHCP 
 para controlar qué dispositivos externos pueden conectarse a la red WiFi del 
@@ -169,7 +169,7 @@ infraestructura de red del laboratorio. Se recomienda como proyecto de titulaci�
 independiente con participación del equipo de administración de redes del 
 departamento.
 
-\subsubsection{Módulo 4 --- Administración de Salas}
+\subsubsection{Administración de Salas}
 
 Módulo de gestión de horarios y reservas de las salas de clases del LabDIC. Permite 
 a los profesores solicitar salas, visualizar disponibilidad en formato calendario y 

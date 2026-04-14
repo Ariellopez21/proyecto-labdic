@@ -441,9 +441,124 @@ Todo el proyecto backend está configurado y gestionado dentro de un entorno vir
 
 \subsubsection{Diagrama Entidad Relación}\label{sec:diagrama_ER}
 
+%\begin{figure}[H]
+	%\centering
+	%\includegraphics[width=1\textwidth]{img/labdic_inventory_ER.png}
+	%\caption{Diagrama ER del modelo para Inventario LabDIC}
+	%\label{fig:diagrama_modelo_entidad_relacion}
+%\end{figure}
+
+%\pagestyle{empty}
+
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{img/labdic_inventory_ER.png}
-    \caption{Diagrama ER del modelo para Inventario LabDIC}
-    \label{fig:diagrama_modelo_entidad_relacion}
+	\centering
+	\resizebox{\textwidth}{0.80\textheight}{%
+		\begin{tikzpicture}[node distance=0.7cm and 1.0cm]
+			
+			% ── Catálogo fila 1 ──────────────────────────────────────────────────────────
+			\node[ent] (brand) at (0,0) {
+				\nodepart{one}\textbf{\color{white}Brand}
+				\nodepart{two}\underline{id}: INT PK\\ name: VARCHAR(100)
+			};
+			\node[ent, right=1.2cm of brand] (model) {
+				\nodepart{one}\textbf{\color{white}Model}
+				\nodepart{two}\underline{id}: INT PK\\ name: VARCHAR(100)
+			};
+			\node[ent, right=1.2cm of model] (category) {
+				\nodepart{one}\textbf{\color{white}Category}
+				\nodepart{two}\underline{id}: INT PK\\ name: VARCHAR(100)
+			};
+			\node[ent, right=1.2cm of category] (ubication) {
+				\nodepart{one}\textbf{\color{white}Ubication}
+				\nodepart{two}\underline{id}: INT PK\\ name: VARCHAR(100)\\ description: VARCHAR(500)
+			};
+			\node[ent, right=1.2cm of ubication] (status) {
+				\nodepart{one}\textbf{\color{white}Status}
+				\nodepart{two}\underline{id}: INT PK\\ name: VARCHAR(50)
+			};
+			
+			% ── Product fila 2 ───────────────────────────────────────────────────────────
+			\node[ent, below=1.4cm of model] (product) {
+				\nodepart{one}\textbf{\color{white}Product}
+				\nodepart{two}
+				\underline{id}: INT PK\\ name: VARCHAR(100)\\ brand\_id: INT FK\\ model\_id: INT FK\\ category\_id: INT FK\\ description: VARCHAR(500)\\ is\_active: BOOL\\ created\_at: DATETIME
+			};
+			
+			% ── Device fila 3 ────────────────────────────────────────────────────────────
+			\node[ent, below=1.4cm of product] (device) {
+				\nodepart{one}\textbf{\color{white}Device}
+				\nodepart{two}
+				\underline{id}: INT PK\\ product\_id: INT FK\\ internal\_code: VARCHAR(50)\\ serial\_number: VARCHAR(50)\\ status\_id: INT FK\\ ubication\_id: INT FK\\ created\_at: DATETIME
+			};
+			
+			% ── LoanRequestItem + DeviceStatusLog fila 4 ─────────────────────────────────
+			\node[ent, below=1.4cm of device] (lri) {
+				\nodepart{one}\textbf{\color{white}LoanRequestItem}
+				\nodepart{two}
+				\underline{id}: INT PK\\ loan\_request\_id: INT FK\\ device\_id: INT FK
+			};
+			\node[ent, right=1.2cm of lri] (dsl) {
+				\nodepart{one}\textbf{\color{white}DeviceStatusLog}
+				\nodepart{two}
+				\underline{id}: INT PK\\ device\_id: INT FK\\ status\_id: INT FK\\ user\_id: INT FK\\ timestamp: DATETIME
+			};
+			
+			% ── LoanRequest fila 5 ────────────────────────────────────────────────────────
+			\node[ent, below=1.4cm of lri] (loanreq) {
+				\nodepart{one}\textbf{\color{white}LoanRequest}
+				\nodepart{two}
+				\underline{id}: INT PK\\ user\_id: INT FK\\ status\_id: INT FK\\ reason: VARCHAR(500)\\ request\_date: DATETIME\\ delivery\_date: DATETIME\\ estimated\_return: DATETIME\\ actual\_return: DATETIME
+			};
+			
+			% ── User / UserRole / Role columna izquierda ──────────────────────────────────
+			\node[ent, left=1.8cm of loanreq] (user) {
+				\nodepart{one}\textbf{\color{white}User}
+				\nodepart{two}
+				\underline{id}: INT PK\\ rut: VARCHAR(12)\\ name: VARCHAR(100)\\ username: VARCHAR(50)\\ email: VARCHAR(100)\\ password: VARCHAR(256)\\ phone: VARCHAR(18)\\ address: VARCHAR(360)\\ is\_active: BOOL\\ is\_admin: BOOL\\ created\_at: DATETIME
+			};
+			\node[piv, above=1.0cm of user] (userrole) {
+				\nodepart{one}\textbf{\color{white}UserRole}
+				\nodepart{two}user\_id: INT FK (PK)\\ role\_id: INT FK (PK)
+			};
+			\node[ent, above=1.0cm of userrole] (role) {
+				\nodepart{one}\textbf{\color{white}Role}
+				\nodepart{two}\underline{id}: INT PK\\ name: VARCHAR(50)\\ description: VARCHAR(255)
+			};
+			
+			% ── Relaciones ────────────────────────────────────────────────────────────────
+			\draw[rel] (brand.south) -- ++(0,-0.1) -| (product.north west)
+			node[pos=0.2, above, font=\tiny\color{relfg}]{1};
+			\draw[rel] (model.south) -- (product.north)
+			node[midway, right, font=\tiny\color{relfg}]{1};
+			\draw[rel] (category.south) -- ++(0,-0.1) -| (product.north east)
+			node[pos=0.2, above, font=\tiny\color{relfg}]{1};
+			\draw[rel] (product.south) -- (device.north)
+			node[midway, right, font=\tiny\color{relfg}]{1..N};
+			\draw[rel] (ubication.south) -- ++(0,-0.15) -| (device.east)
+			node[pos=0.15, right, font=\tiny\color{relfg}]{1};
+			\draw[rel] (status.south) -- ++(0,-0.1) -- ++(0.5,0) |- (device.east)
+			node[pos=0.1, right, font=\tiny\color{relfg}]{1};
+			\draw[rel] (status.south) -- ++(0,-0.1) -- ++(0.5,0) |- (loanreq.east)
+			node[pos=0.85, right, font=\tiny\color{relfg}]{1};
+			\draw[rel] (status.south) -- ++(0,-0.1) -- ++(0.15,0) |- (dsl.east)
+			node[pos=0.5, right, font=\tiny\color{relfg}]{1};
+			\draw[rel] (device.south) -- (lri.north)
+			node[midway, right, font=\tiny\color{relfg}]{1..N};
+			\draw[rel] (device.east) -| (dsl.north)
+			node[pos=0.25, above, font=\tiny\color{relfg}]{1..N};
+			\draw[rel] (loanreq.north) -- (lri.south)
+			node[midway, right, font=\tiny\color{relfg}]{1..N};
+			\draw[rel] (user.east) -- (loanreq.west)
+			node[midway, above, font=\tiny\color{relfg}]{1..N};
+			\draw[rel] (user.north) -- ++(0,0.2) -- ++(4.8,0) |- (dsl.west)
+			node[pos=0.8, above, font=\tiny\color{relfg}]{1..N};
+			\draw[rel] (user.north) -- (userrole.south)
+			node[midway, right, font=\tiny\color{relfg}]{N};
+			\draw[rel] (role.south) -- (userrole.north)
+			node[midway, right, font=\tiny\color{relfg}]{N};
+			
+		\end{tikzpicture}
+	}% fin resizebox
+	\caption{Diagrama Entidad-Relación del modelo de base de datos LabDIC.}
+	\label{fig:diagrama_modelo_entidad_relacion}
 \end{figure}

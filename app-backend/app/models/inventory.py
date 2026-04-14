@@ -203,7 +203,6 @@ class LoanRequestItem(Base):
     device_id: Mapped[int] = mapped_column(
         ForeignKey("devices.id", ondelete="CASCADE")
     )
-    device_id: Mapped[int] = mapped_column(ForeignKey("devices.id"))
 
     loan_request: Mapped["LoanRequest"] = relationship("LoanRequest", back_populates="loan_request_items")
     device: Mapped["Device"] = relationship("Device", back_populates="loan_request_items")

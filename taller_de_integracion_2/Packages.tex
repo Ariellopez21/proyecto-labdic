@@ -39,7 +39,35 @@
 
 % Tikz
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta, positioning, babel}
+\usetikzlibrary{positioning, shapes.multipart, arrows.meta, babel}
+
+\definecolor{hdrbg}{HTML}{2563EB}
+\definecolor{bodybg}{HTML}{EFF6FF}
+\definecolor{bodyborder}{HTML}{2563EB}
+\definecolor{pivothdr}{HTML}{CA8A04}
+\definecolor{pivotbody}{HTML}{FEF9C3}
+\definecolor{relfg}{HTML}{475569}
+
+\tikzset{
+	ent/.style={
+		rectangle split, rectangle split parts=2,
+		rectangle split part fill={hdrbg, bodybg},
+		draw=bodyborder, thick, rounded corners=2pt,
+		font=\scriptsize, text width=2.2cm, align=left,   % <-- cambiado
+		inner sep=2pt,
+		rectangle split part align={center, left},
+	},
+	piv/.style={
+		rectangle split, rectangle split parts=2,
+		rectangle split part fill={pivothdr, pivotbody},
+		draw=pivothdr, thick, rounded corners=2pt,
+		font=\scriptsize, text width=2.2cm, align=left,   % <-- cambiado
+		inner sep=2pt,
+		rectangle split part align={center, left},
+	},
+	rel/.style={draw=bodyborder, thick, -{Latex[length=2mm,width=1.5mm]}},
+}
+
 %uso matematico
 %\usepackage{algorithm}
 %\usepackage{algpseudocode}
@@ -109,7 +137,8 @@
 	stringstyle     = \color{codestr},
 }
 
-
+% Hiper vínculos
+\usepackage[hidelinks]{hyperref}
 
 % Bibliografia
 \usepackage{csquotes} % Para las comillas y citas.

@@ -60,7 +60,6 @@ sección \ref{sec:marco_teorico}, a través del marco teórico:
 	\item \textbf{Gestión de entorno backend}: UV.
 	\item \textbf{Gestión de entorno frontend}: bun.
 	\item \textbf{Gestión de versiones del proyecto}: Git + Repositorio en GitHub.
-	\item \textbf{Orquestador}: Docker Compose.
 \end{itemize}
 
 El sistema se estructura bajo un modelo de arquitectura cliente-servidor, donde el frontend 
@@ -100,56 +99,45 @@ los siguientes requerimientos:
 	\item \textbf{RNF4. Rendimiento}: El sistema debe garantizar tiempos de respuesta nativos 
 	menores a 1.5 segundos, permitiendo la gestión simultánea de múltiples solicitudes sin 
 	afectar la experiencia del usuario.
-	\item \textbf{RNF5. Portabilidad}: El sistema debe orquestarse con \textbf{Docker 
-		Compose}, asegurando portabilidad y una configuración simplificada del entorno de 
-	ejecución.
-	\item \textbf{RNF6. Interfaz de usuario}: El sistema debe contar con una interfaz gráfica 
+	\item \textbf{RNF5. Interfaz de usuario}: El sistema debe contar con una interfaz gráfica 
 	intuitiva, que facilite la interacción tanto a usuarios como a administradores.
-	\item \textbf{RNF7. Usabilidad}: La interfaz debe ser accesible, consistente y simple de 
+	\item \textbf{RNF6. Usabilidad}: La interfaz debe ser accesible, consistente y simple de 
 	utilizar, reduciendo la curva de aprendizaje de los usuarios.
 \end{itemize}
 
 \subsection{Planificación}
 
-La planificación del sistema se estructura en un formato basado en hitos, los cuales 
-representan entregas parciales con avances significativos y funcionales. Cada hito está 
-directamente vinculado a la carta Gantt, funcionando como punto de control que permite dar 
-seguimiento al progreso y asegurar el cumplimiento de los objetivos establecidos.
+La planificación del sistema se estructura en cinco hitos, cada uno de los cuales representa 
+una etapa de desarrollo con entregables concretos y funcionales. Esta organización permite 
+dar seguimiento progresivo al avance del proyecto, asegurando que cada fase consolide los 
+fundamentos necesarios para la siguiente.
 
 \begin{itemize}
-	\item \textbf{Hito 1 (1 semana):} Diseño e implementación del modelo de base de datos 
-	relacional y configuración del entorno de migraciones con Alembic, estableciendo la 
-	estructura de datos que sustentará todos los módulos del sistema.
+	\item \textbf{Hito 1 (2 semanas):} Planificación, motivación y marco teórico. 
+	Comprende el análisis de las necesidades del laboratorio, la definición del alcance 
+	del sistema, la selección del stack tecnológico y la elaboración del marco teórico 
+	que fundamenta las decisiones de diseño.
 	
-	\item \textbf{Hito 2 (3 semanas):} Desarrollo del backend: implementación de los 
-	servicios y endpoints de la API REST para todos los módulos del sistema (usuarios, 
-	catálogo de administración, productos, dispositivos y préstamos). A lo largo de este 
-	hito y de los siguientes, se aplicarán migraciones con Alembic y se realizarán 
-	correcciones en los servicios del backend conforme el desarrollo del frontend vaya 
-	evidenciando nuevas necesidades.
+	\item \textbf{Hito 2 (2 semanas):} Diseño e implementación del modelo de base de datos 
+	relacional. Incluye la definición de las entidades del sistema (usuarios, catálogo, 
+	productos, dispositivos y préstamos), sus relaciones y la configuración del entorno 
+	de migraciones con Alembic.
 	
-	\item \textbf{Hito 3 (1 semana):} Implementación del frontend del módulo de usuarios: 
-	registro, autenticación y gestión de roles.
+	\item \textbf{Hito 3 (3 semanas):} Implementación del backend. Desarrollo de los 
+	servicios, repositorios, DTOs y controladores de los seis módulos funcionales del 
+	sistema, exponiendo la API REST documentada que sirve como base para el desarrollo 
+	del frontend. A lo largo de este hito se aplicarán migraciones iterativas con Alembic 
+	conforme evolucionen los requerimientos.
 	
-	\item \textbf{Hito 4 (3 semanas):} Implementación del frontend del catálogo de 
-	administración: marcas, categorías, modelos, estados y ubicaciones.
+	\item \textbf{Hito 4 (9 semanas):} Implementación del frontend. Desarrollo progresivo 
+	de las vistas, componentes, stores y servicios del sistema, cubriendo los módulos de 
+	usuarios y autenticación, catálogo de administración, productos, dispositivos y 
+	préstamos. Incluye la revisión final de UX/UI, el soporte de modo claro y oscuro, 
+	el comportamiento \textit{responsive} y la implementación de notificaciones 
+	\texttt{Toast}. Este hito contempla una pausa programada sin avances entre las fases 
+	intermedias.
 	
-	\item \textbf{--- Pausa programada sin avances.}
-	
-	\item \textbf{Hito 5 (2 semanas):} Implementación del frontend del módulo de productos, 
-	integrado con el catálogo de administración.
-	
-	\item \textbf{Hito 6 (2 semanas):} Implementación del frontend del módulo de 
-	dispositivos, enlazado con productos y preparado para la gestión de préstamos.
-	
-	\item \textbf{Hito 7 (2 semanas):} Implementación del frontend del módulo de préstamos: 
-	flujo completo de solicitudes, aprobaciones y devoluciones.
-	
-	\item \textbf{Hito 8 (2 semanas):} Revisión de UI/UX, optimización de interfaces, 
-	corrección de errores visuales y adaptación de la interfaz a distintos dispositivos y 
-	resoluciones de pantalla.
-	
-	\item \textbf{Hito 9 (2 semanas):} Documentación del trabajo futuro: identificación y 
-	descripción de funcionalidades potenciales que quedan fuera del alcance del proyecto 
-	actual.
+	\item \textbf{Hito 5 (2 semanas):} Documentación de la arquitectura técnica del sistema. 
+	Descripción de los patrones de diseño, la organización de capas, los mecanismos de 
+	comunicación entre frontend y backend, y el flujo completo de consumo de la API.
 \end{itemize}
